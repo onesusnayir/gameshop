@@ -1,5 +1,4 @@
 'use client'
-export const dynamic = 'force-dynamic'
 
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect, use } from "react";
@@ -24,10 +23,13 @@ export default function GamePage() {
     const router = useRouter()
 
     useEffect(() => {
+    if (typeof window !== "undefined") {
         const searchParams = new URLSearchParams(window.location.search);
         const gameId = searchParams.get('id');
         setId(gameId);
+    }
     }, []);
+
 
         useEffect(() => {
         const checkSession = async () => {
@@ -42,6 +44,7 @@ export default function GamePage() {
     }, [])
 
     useEffect(() => {
+        if (!id) return;
         const fetchGame = async () => {
             const { data, error } = await supabaseClient
                 .from('game')
@@ -57,7 +60,7 @@ export default function GamePage() {
         }
 
         fetchGame();
-    },[])
+    },[id])
 
     const handleBuy = () => {
         router.push(`/checkout?id=${game?.id}`);

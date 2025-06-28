@@ -29,10 +29,13 @@ export default function Checkout() {
     const router = useRouter();
 
     useEffect(() => {
+    if (typeof window !== "undefined") {
         const searchParams = new URLSearchParams(window.location.search);
         const gameId = searchParams.get('id');
         setId(gameId);
+    }
     }, []);
+
 
     useEffect(() => {
         const checkSession = async () => {
@@ -47,6 +50,8 @@ export default function Checkout() {
     }, [])
 
     useEffect(() => {
+        if (!id) return;
+
         const fetchGame = async () => {
             const { data, error } = await supabaseClient
                 .from('game')
@@ -62,7 +67,7 @@ export default function Checkout() {
         }
 
         fetchGame();
-    }, []);
+    }, [id]);
 
     // Buy Onlciclk
     const handlePay = async () => {
