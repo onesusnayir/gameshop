@@ -1,7 +1,6 @@
 import midtransClient from 'midtrans-client'
 import { NextRequest } from 'next/server'
 import { v4 as uuidv4 } from 'uuid'
-import supabaseClient from '@/lib/supabaseClient'
 
 const snap = new midtransClient.Snap({
   isProduction: false,
@@ -31,13 +30,13 @@ async function createToken(gross_amount: number): Promise<{ token: string, order
 }
 
 export async function POST(req: NextRequest) {
-  const { gross_amount, game_id } = await req.json()
+  const { gross_amount } = await req.json()
 
   try {
     const data = await createToken(gross_amount)
 
     return Response.json({ token: data.token, orderId: data.orderId })
   } catch (e) {
-    return new Response('Failed to create transaction', { status: 500 })
+    return new Response(`Failed to create transaction: ${e}`, { status: 500 })
   }
 }

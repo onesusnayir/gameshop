@@ -1,6 +1,7 @@
 'use client'
+
 import Sidebar from "@/components/ui/sidebar"
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import supabaseClient from "@/lib/supabaseClient";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
