@@ -1,5 +1,4 @@
 'use client';
-export const dynamic = 'force-dynamic'
 
 import supabaseClient from "@/lib/supabaseClient"
 import { useState, useEffect } from "react";
@@ -24,10 +23,16 @@ type Game = {
 
 export default function Checkout() {
     const [game, setGame] = useState<Game | null>(null);
+    const [id, setId] = useState<string | null>(null);
     const searchParams = useSearchParams()
-    const id = searchParams.get('id');
     const [token, setToken] = useState<string | null>(null);
     const router = useRouter();
+
+    useEffect(() => {
+        const searchParams = new URLSearchParams(window.location.search);
+        const gameId = searchParams.get('id');
+        setId(gameId);
+    }, []);
 
     useEffect(() => {
         const checkSession = async () => {

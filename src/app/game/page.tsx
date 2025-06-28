@@ -19,9 +19,15 @@ type Game = {
 
 export default function GamePage() {
     const searchParams = useSearchParams()
-    const id = searchParams.get('id')
+    const [id, setId] = useState<string | null>(null);
     const [ game, setGame ] = useState<Game>();
     const router = useRouter()
+
+    useEffect(() => {
+        const searchParams = new URLSearchParams(window.location.search);
+        const gameId = searchParams.get('id');
+        setId(gameId);
+    }, []);
 
         useEffect(() => {
         const checkSession = async () => {
