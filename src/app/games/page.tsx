@@ -3,6 +3,7 @@ import { useState, useEffect, use } from "react";
 import supabaseClient from "@/lib/supabaseClient";
 import Image from "next/image";
 import Sidebar from "@/components/ui/sidebar";
+import { useRouter } from "next/navigation";
 
 type Game = {
   id: string;
@@ -15,6 +16,20 @@ type Game = {
 
 export default function GamesPage() {
     const [games, setGames] = useState<Game[]>([]);
+    const router = useRouter();
+
+    useEffect(() => {
+        const checkSession = async () => {
+        const { data: { session } } = await supabaseClient.auth.getSession()
+        console.log(session)
+            if (!session) {
+                router.push('/login')
+            }
+        }
+
+        checkSession()
+    }, [])
+
     useEffect(() => {
         const fetchGames = async () => {
             const { data, error } = await supabaseClient
@@ -38,9 +53,13 @@ export default function GamesPage() {
         fetchGames();
     }, [])
 
+    const handleClick = (id: string) => {
+        router.push(`/game?id=${id}`);
+    }
+
     const gameElements = games.map((game) => {
         return (
-            <div key={game.id} className="flex">
+            <div onClick={ () => handleClick(game.id)} key={game.id} className="flex cursor-pointer">
                 <Image
                 src={game.image}
                 alt={game.name}

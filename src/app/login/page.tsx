@@ -21,11 +21,15 @@ export default function LoginPage() {
         });
 
         if (error) {
+            alert('Login gagal: ' + error.message);
             console.error('Login gagal:', error.message);
         } else {
-            console.log('Login berhasil:', data);
             router.push(`/`)
         }
+    }
+
+    const handleSignUp = () => {
+        router.push('/register');
     }
 
     return(
@@ -48,9 +52,9 @@ export default function LoginPage() {
                     <Label htmlFor="password">Password</Label>
                     <Input type="password" placeholder="Password" name={'password'}/>
                     
-                    <div className="flex flex-col gap-3 mt-5">
-                        <button className="px-6 py-2 bg-amber-400 rounded-3xl" type="submit">Sign in</button>
-                        <button type="button">Dont have an account? Sign up</button>
+                    <div className="flex flex-col gap-3 mt-5 items-center">
+                        <button className="px-6 py-2 bg-amber-400 rounded-3xl w-full cursor-pointer" type="submit">Sign in</button>
+                        <div className="flex">Dont have an account?<button onClick={handleSignUp} type="button" className="ml-2 cursor-pointer text-orange-400">Sign Up</button></div>
                     </div>
                 </form>
             </div>

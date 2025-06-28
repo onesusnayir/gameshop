@@ -25,6 +25,18 @@ export default function Home() {
   const [ games, setGames ] = useState<Game[]>([]);
   const router = useRouter()
 
+      useEffect(() => {
+        const checkSession = async () => {
+        const { data: { session } } = await supabaseClient.auth.getSession()
+        console.log(session)
+            if (!session) {
+                router.push('/login')
+            }
+        }
+
+        checkSession()
+    }, [])
+
   useEffect(() => {
     const fetchGames = async () => {
       const { data, error } = await supabaseClient
@@ -66,7 +78,7 @@ export default function Home() {
         <p className="text-sm">Developer: {game.developer}</p>
         <p className="text-sm">Price: ${game.price}</p>
         <button 
-        className="text-sm bg-orange-400 py-0.5 px-5 rounded-2xl mt-2 font-semibold"
+        className="text-sm bg-orange-400 py-0.5 px-5 rounded-2xl mt-2 font-semibold cursor-pointer"
         onClick={ () => {handleBuy(game.id)} }
         >Add to Cart</button>
       </div>

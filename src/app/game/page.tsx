@@ -3,7 +3,6 @@
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect, use } from "react";
 import { useRouter } from 'next/navigation'
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import Sidebar from '@/components/ui/sidebar';
 import supabaseClient from "@/lib/supabaseClient";
 import Image from "next/image";
@@ -22,6 +21,18 @@ export default function GamePage() {
     const id = searchParams.get('id')
     const [ game, setGame ] = useState<Game>();
     const router = useRouter()
+
+        useEffect(() => {
+        const checkSession = async () => {
+        const { data: { session } } = await supabaseClient.auth.getSession()
+        console.log(session)
+            if (!session) {
+                router.push('/login')
+            }
+        }
+
+        checkSession()
+    }, [])
 
     useEffect(() => {
         const fetchGame = async () => {
@@ -52,8 +63,7 @@ export default function GamePage() {
             return;
         }
         const userId = userData?.user?.id;
-        console.log("User:", userId)
-        console.log("Game:", game)
+        
         const { data, error } = await supabaseClient
             .from('cart')
             .insert({
@@ -87,10 +97,10 @@ export default function GamePage() {
                 <p className="text-sm">Price: ${game.price}</p>
                 <div className='flex gap-5'>
                     <button 
-                        className="text-sm bg-orange-400 py-0.5 px-5 rounded-2xl mt-2 font-semibold"
+                        className="text-sm bg-orange-400 py-0.5 px-5 rounded-2xl mt-2 font-semibold cursor-pointer"
                         onClick={ handleBuy }>Buy</button>
                     <button 
-                        className="text-sm bg-orange-400 py-0.5 px-5 rounded-2xl mt-2 font-semibold"
+                        className="text-sm bg-orange-400 py-0.5 px-5 rounded-2xl mt-2 font-semibold cursor-pointer"
                         onClick={ handleCart }>Add to cart</button>
                 </div>
             </div>

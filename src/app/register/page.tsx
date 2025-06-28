@@ -20,6 +20,7 @@ export default function RegisterPage() {
         });
 
         if (error) {
+            alert('Submit gagal: ' + error.message);
             console.error('Submit gagal:', error.message);
         } else {
             console.log('Submit berhasil:', data);
@@ -27,6 +28,10 @@ export default function RegisterPage() {
         }
     }
 
+    const handleSignIn = () => {
+        router.push('/login');
+    }
+    
     return(
         <div className="h-[100vh] flex items-center justify-end">
             <div className="grow h-[100%] flex items-center justify-center">
@@ -47,9 +52,9 @@ export default function RegisterPage() {
                     <Label htmlFor="password">Password</Label>
                     <Input type="password" placeholder="Password" name={'password'}/>
                     
-                    <div className="flex flex-col gap-3 mt-5">
-                        <button className="px-6 py-2 bg-amber-400 rounded-3xl" type="submit">Sign up</button>
-                        <button type="button">Alrady have an account? Sign in</button>
+                    <div className="flex flex-col gap-3 mt-5 items-center">
+                        <button className="px-6 py-2 bg-amber-400 rounded-3xl w-full cursor-pointer" type="submit">Sign up</button>
+                        <div>Alrady have an account?<button onClick={handleSignIn} type="button" className="cursor-pointer ml-2 text-orange-400">Sign in</button></div>
                     </div>
                 </form>
             </div>
