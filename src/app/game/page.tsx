@@ -17,7 +17,6 @@ type Game = {
 }
 
 export default function GamePage() {
-    const searchParams = useSearchParams()
     const [id, setId] = useState<string | null>(null);
     const [ game, setGame ] = useState<Game>();
     const router = useRouter()
