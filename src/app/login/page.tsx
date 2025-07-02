@@ -80,7 +80,7 @@ export default function LoginPage() {
                     
                     <div className="flex flex-col gap-3 mt-5 items-center">
                         <button className="px-6 py-2 rounded-[5px] w-full cursor-pointer text-black " style={{ backgroundColor: 'var(--green)' }} type="submit">Log in</button>
-                        <div className="flex">Need an account?<button onClick={handleSignUp} type="button" className="ml-2 cursor-pointer" style={{ color: 'var(--green)' }}>Register here</button></div>
+                        <div className="flex whitespace-nowrap">Need an account?<button onClick={handleSignUp} type="button" className="ml-2 cursor-pointer" style={{ color: 'var(--green)' }}>Register here</button></div>
                     </div>
                 </form>
                 <p className="text-white text-xs mx-auto mt-auto mb-5">Terms of Service | Privacy Policy</p>
