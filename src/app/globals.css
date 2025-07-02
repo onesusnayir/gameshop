@@ -2,11 +2,12 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Icons */
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined';
   font-weight: normal;
   font-style: normal;
-  font-size: inherit; /* biar bisa diubah pakai Tailwind `text-...` */
+  font-size: inherit;
   line-height: 1;
   letter-spacing: normal;
   text-transform: none;
@@ -16,3 +17,14 @@
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
 }
+
+
+:root {
+  /* Set Font */
+  font-family: 'Poppins', sans-serif;
+
+  /* Color Variable */
+  --light-blue: #3676FF;
+  --light-gray: #B5B5B5;
+}
+
