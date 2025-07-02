@@ -51,14 +51,14 @@ export default function LoginPage() {
         <div className="h-[100vh] flex items-center justify-end">
             <div className="grow h-[100%] flex items-center justify-center">
                 <Image 
-                src={'/games_bg.png'}
-                width={200}
-                height={200}
+                src={'/games_bg.jpg'}
+                width={1820}
+                height={1024}
                 alt={'Games'}
-                className="w-full h-full object-fit"
+                className="w-full h-full object-cover"
                 />
             </div>
-            <div className="h-full w-[50%] text-black flex flex-col justify-center border-l-1" style={{ backgroundColor: 'var(--gray)'}}>
+            <div className="max-w-[790px] h-full w-[50%] text-black flex flex-col justify-center border-l-1" style={{ backgroundColor: 'var(--gray)'}}>
                 <form className="flex flex-col text-white p-20" onSubmit={handleSubmit}>
                     <div className="mb-10">
                         <h1 className="w-[100%] text-start text-3xl text-white">Log in to <span className="font-bold" style={{color: 'var(--green)'}}>IGUS STORE</span></h1>

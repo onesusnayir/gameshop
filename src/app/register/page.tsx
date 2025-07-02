@@ -43,7 +43,7 @@ export default function RegisterPage() {
     return(
         <div className="h-[100vh] flex items-center justify-end">
             <div className="h-full w-[50%] text-black flex flex-col justify-center border-l-1" style={{backgroundColor: 'var(--gray)'}}>
-                <form className="flex flex-col text-white p-20" onSubmit={handleSubmit}>
+                <form className="max-w-[790px] flex flex-col text-white p-20" onSubmit={handleSubmit}>
                     <div className="mb-10">
                         <h1 className="w-[100%] text-start text-3xl text-white">Create your <span style={{ color: 'var(--green)'}}>Account</span></h1>
                         <p style={{color: 'var(--light-gray'}}>57.000+ players waiting you!</p>
@@ -71,11 +71,11 @@ export default function RegisterPage() {
 
             <div className="grow h-[100%] flex items-center justify-center">
                 <Image 
-                src={'/games_bg.png'}
-                width={200}
-                height={200}
+                src={'/games_bg.jpg'}
+                width={1820}
+                height={1024}
                 alt={'logo'}
-                className="w-full h-full object-fit"
+                className="w-full h-full object-cover"
                 />
             </div>
         </div>
