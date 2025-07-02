@@ -41,7 +41,7 @@ export default function RegisterPage() {
 
     
     return(
-        <div className="h-[100vh] flex items-center justify-end">
+        <div className="h-[100vh] flex items-center justify-end overflow-x-hidden">
             <div className="h-full w-[50%] text-black flex flex-col justify-center border-l-1" style={{backgroundColor: 'var(--gray)'}}>
                 <form className="max-w-[790px] flex flex-col text-white p-20" onSubmit={handleSubmit}>
                     <div className="mb-10">
@@ -63,7 +63,7 @@ export default function RegisterPage() {
                     </div>
                     <div className="flex flex-col gap-3 mt-5 items-center">
                         <button className="px-6 py-2 rounded-[5px] w-full cursor-pointer text-black" style={{ backgroundColor: 'var(--green)'}} type="submit">Sign up</button>
-                        <div>Alrady have an account?<button onClick={handleSignIn} type="button" className="cursor-pointer ml-2" style={{ color: 'var(--green)'}}>Sign in here</button></div>
+                        <div className="flex items-center whitespace-nowrap">Alrady have an account?<button onClick={handleSignIn} type="button" className="cursor-pointer ml-2" style={{ color: 'var(--green)'}}>Sign in here</button></div>
                     </div>
                 </form>
                 <p className="text-white text-xs mx-auto mt-auto mb-5">Terms of Service | Privacy Policy</p>

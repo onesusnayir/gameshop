@@ -48,7 +48,7 @@ export default function LoginPage() {
 
 
     return(
-        <div className="h-[100vh] flex items-center justify-end">
+        <div className="h-[100vh] flex items-center justify-end overflow-x-hidden">
             <div className="grow h-[100%] flex items-center justify-center">
                 <Image 
                 src={'/games_bg.jpg'}
@@ -76,7 +76,7 @@ export default function LoginPage() {
                                 </span>
                             </button>
                     </div>
-                    <div className="flex">Forget your<button onClick={handleForgetPassword} type="button" className="ml-2 cursor-pointer text-white" style={{ color: 'var(--green)' }}>password?</button></div>
+                    <div className="flex">Forget your <button onClick={handleForgetPassword} type="button" className=" cursor-pointer text-white ml-1" style={{ color: 'var(--green)' }}>password?</button></div>
                     
                     <div className="flex flex-col gap-3 mt-5 items-center">
                         <button className="px-6 py-2 rounded-[5px] w-full cursor-pointer text-black " style={{ backgroundColor: 'var(--green)' }} type="submit">Log in</button>
