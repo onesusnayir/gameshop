@@ -19,18 +19,6 @@ export default function GamesPage() {
     const router = useRouter();
 
     useEffect(() => {
-        const checkSession = async () => {
-        const { data: { session } } = await supabaseClient.auth.getSession()
-        console.log(session)
-            if (!session) {
-                router.push('/login')
-            }
-        }
-
-        checkSession()
-    }, [])
-
-    useEffect(() => {
         const fetchGames = async () => {
             const { data, error } = await supabaseClient
                 .from('game')

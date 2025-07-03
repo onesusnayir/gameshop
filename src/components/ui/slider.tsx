@@ -1,6 +1,6 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
-import Image from "next/image";
+import { useRouter } from 'next/navigation'
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -20,16 +20,21 @@ interface SliderProps {
 }
 
 export default function Slider({ games } : SliderProps){
-
+    const router = useRouter()
+    const handleMoveGame = (gameid : string) => {
+      router.push(`/game?id=${gameid}`)
+    }
+  
     return (
        <div className="w-full">
         <Swiper
             modules={[Navigation, Pagination, Autoplay]}
-            autoplay={{ delay: 5000 }}
+            autoplay={{ delay: 5000,
+              disableOnInteraction: false,
+             }}
             spaceBetween={50}
             slidesPerView={1}
             navigation
-            pagination={{ clickable: true }}
             loop={true}
             >
         {games.length > 0 && games.map((game) => (
@@ -42,7 +47,7 @@ export default function Slider({ games } : SliderProps){
                     <p className='px-5 py-2 w-fit text-xs' style={{ backgroundColor: 'var(--gray)'}}>Latest Relases Games</p>
                     <h1 className='text-6xl font-semibold'>{game.name}</h1>
                     <p className='' style={{color: 'var(--light-gray)'}}>{game.description}</p>
-                    <button className='px-4 py-1 text-black rounded-sm' style={{ backgroundColor: 'var(--green)'}}>Go to Store</button>
+                    <button onClick={() => handleMoveGame(game.id)} className='px-4 py-1 text-black rounded-sm cursor-pointer' style={{ backgroundColor: 'var(--green)'}}>Go to Store</button>
                 </div>
             </div>
           </SwiperSlide>

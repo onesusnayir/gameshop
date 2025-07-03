@@ -1,6 +1,5 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation';
 import { useState, useEffect, use } from "react";
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/ui/sidebar';
@@ -28,19 +27,6 @@ export default function GamePage() {
         setId(gameId);
     }
     }, []);
-
-
-        useEffect(() => {
-        const checkSession = async () => {
-        const { data: { session } } = await supabaseClient.auth.getSession()
-        console.log(session)
-            if (!session) {
-                router.push('/login')
-            }
-        }
-
-        checkSession()
-    }, [])
 
     useEffect(() => {
         if (!id) return;

@@ -2,6 +2,7 @@
 
 import Slider from '@/components/ui/slider'
 import Navbar from '@/components/ui/navbar'
+import GameSlider from '@/components/ui/gamesSlider'
 import Image from "next/image";
 import supabaseClient from '@/lib/supabaseClient';
 import { useState, useEffect } from 'react'
@@ -44,7 +45,7 @@ export default function home(){
 
     const gamesGrid = games.map((game) => {
         return(
-            <div key={game.id} className="relative h-[300px] w-[200px] bg-no-repeat bg-cover flex flex-col justify-end" style={{ backgroundImage: `url(${game.image})` }}>
+            <div key={game.id} className="relative h-[400px] w-[200px] bg-no-repeat bg-cover flex flex-col justify-end" style={{ backgroundImage: `url(${game.image})` }}>
                 <div className="absolute bottom-12 left-0 w-full h-10 bg-gradient-to-t from-[#1D1D1D] to-transparent z-10" />
                 <div className='relative h-[50px] p-4 z-20' style={{ backgroundColor: 'var(--gray)'}}>
                     <h1 className='font-semibold text-[14px] text-white text-nowrap'>{game.name}</h1>
@@ -58,7 +59,7 @@ export default function home(){
         <div style={{ backgroundColor: 'var(--gray)'}}>
             <header>
                 <Navbar />
-                <div>
+                <div className='mt-[60px]'>
                     {/* <Slider /> */}
                     <Slider games={games}/>
                 </div>
@@ -67,7 +68,7 @@ export default function home(){
                 <h2 className='text-white text-2xl font-bold m-3'>Our Featured Games</h2>
                 <div className='flex gap-5 p-5'>
                     {
-                        games.length > 0 && gamesGrid
+                        games.length > 0 && <GameSlider games={games}/>
                     }
                 </div>
             </main>
