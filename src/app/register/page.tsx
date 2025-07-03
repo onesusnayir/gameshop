@@ -12,11 +12,21 @@ export default function RegisterPage() {
         e.preventDefault();
 
         const formData = new FormData(e.currentTarget);
-        const email = formData.get('email') as string;
-        const username = formData.get('username') as string;
-        const password = formData.get('password') as string;
+        const email = (formData.get('email') as string || '').trim();
+        const username = (formData.get('username') as string || '').trim();
+        const password = (formData.get('password') as string || '').trim();
 
         if(!email && !username && !password){
+            return;
+        }
+
+        const { data: existingUser, error: userCheckError } = await supabaseClient
+            .from('user')
+            .select('id')
+            .eq('username', username)
+            .maybeSingle(); 
+        if (existingUser) {
+            alert("Username sudah digunakan.");
             return;
         }
 
@@ -32,7 +42,10 @@ export default function RegisterPage() {
 
         if (error) {
             console.error('Submit gagal:', error.message);
-        } 
+        }
+        if(data){
+            alert('We sent an email to you')
+        }
     }
 
     const handleSignIn = () => {

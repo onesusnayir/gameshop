@@ -9,27 +9,71 @@ export default function LoginPage() {
     const [ showPass, setShowPass ] = useState(false)
     const router = useRouter()
 
+    function isEmail(input: string): boolean {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
+    }
+
     // Submit Btn OnClick
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const formData = new FormData(e.currentTarget);
-        const email = formData.get('email') as string;
-        const password = formData.get('password') as string;
-        console.log(email)
-        console.log(password)
+        const email = (formData.get('email') as string || '').trim();
+        const password = (formData.get('password') as string || '').trim();
 
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email,
+        const identifier = email.trim();
+        if(isEmail(identifier)){
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: identifier,
+                password,
+            });
+
+            if (error) {
+                alert('Login gagal: ' + error.message);
+                console.error('Login gagal:', error.message);
+            } else {
+                router.push(`/`)
+            }
+        }else{
+            // 1. Ambil auth_id dari username
+            const { data: userData, error: userError } = await supabaseClient
+            .from('user')
+            .select('auth_id')
+            .eq('username', identifier)
+            .single();
+
+            console.log(userData)
+            if (userError || !userData?.auth_id) {
+                throw new Error('Username tidak ditemukan');
+            }
+
+            // 2. Ambil email dari auth.users berdasarkan auth_id
+            const { data: authUser, error: authError } = await supabaseClient
+            .from('auth_users')
+            .select('email')
+            .eq('id', userData.auth_id)
+            .single();
+
+            console.log(authUser?.email)
+
+            if (authError || !authUser?.email) {
+                throw new Error('Email tidak ditemukan untuk username ini');
+            }
+
+            // 3. Login pakai email
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: authUser.email,
             password,
-        });
+            });
 
-        if (error) {
-            alert('Login gagal: ' + error.message);
-            console.error('Login gagal:', error.message);
-        } else {
-            router.push(`/`)
+            if (error) {
+                alert('Login gagal: ' + error.message);
+                console.error('Login gagal:', error.message);
+            } else {
+                router.push(`/`)
+            }
         }
+
     }
 
     // Sign up btn Onclick
