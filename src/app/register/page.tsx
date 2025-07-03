@@ -16,6 +16,10 @@ export default function RegisterPage() {
         const username = formData.get('username') as string;
         const password = formData.get('password') as string;
 
+        if(!email && !username && !password){
+            return;
+        }
+
         const redirectUrl = `https://gameshop-eosin.vercel.app/register-success?username=${encodeURIComponent(username)}`
 
         const { data, error } = await supabaseClient.auth.signUp({
