@@ -27,6 +27,12 @@
   --light-blue: #3676FF;
   --light-gray: #B5B5B5;
   --gray: #1D1D1D;
+  --dark-gray : #363434;
   --green: #AAFF68;
 }
 
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 24px !important; /* ✅ gunakan CSS biasa */
+  color: white; /* contoh jika ingin ganti warna */
+}
