@@ -41,9 +41,9 @@ export default function RegisterPage() {
 
     
     return(
-        <div className="h-[100vh] flex items-center justify-end overflow-x-hidden">
-            <div className="h-full w-[50%] text-black flex flex-col justify-center border-l-1" style={{backgroundColor: 'var(--gray)'}}>
-                <form className="max-w-[790px] flex flex-col text-white p-20" onSubmit={handleSubmit}>
+        <div className="h-[100vh] flex items-center">
+            <div className="h-full min-w-[550px] max-w-[550px] text-black flex flex-col border-l-1" style={{backgroundColor: 'var(--gray)'}}>
+                <form className="flex-grow flex flex-col justify-center text-white px-20" onSubmit={handleSubmit}>
                     <div className="mb-10">
                         <h1 className="w-[100%] text-start text-3xl text-white">Create your <span style={{ color: 'var(--green)'}}>Account</span></h1>
                         <p style={{color: 'var(--light-gray'}}>57.000+ players waiting you!</p>
@@ -66,7 +66,7 @@ export default function RegisterPage() {
                         <div className="flex items-center whitespace-nowrap">Alrady have an account?<button onClick={handleSignIn} type="button" className="cursor-pointer ml-2" style={{ color: 'var(--green)'}}>Sign in here</button></div>
                     </div>
                 </form>
-                <p className="text-white text-xs mx-auto mt-auto mb-5">Terms of Service | Privacy Policy</p>
+                <p className="text-white text-xs mx-auto mb-5">Terms of Service | Privacy Policy</p>
             </div>
 
             <div className="grow h-[100%] flex items-center justify-center">

@@ -58,8 +58,8 @@ export default function LoginPage() {
                 className="w-full h-full object-cover"
                 />
             </div>
-            <div className="max-w-[790px] h-full w-[50%] text-black flex flex-col justify-center border-l-1" style={{ backgroundColor: 'var(--gray)'}}>
-                <form className="flex flex-col text-white p-20" onSubmit={handleSubmit}>
+            <div className="h-full min-w-[550px] max-w-[550px] text-black flex flex-col border-l-1" style={{ backgroundColor: 'var(--gray)'}}>
+                <form className="flex-grow flex flex-col justify-center text-white px-20" onSubmit={handleSubmit}>
                     <div className="mb-10">
                         <h1 className="w-[100%] text-start text-3xl text-white">Log in to <span className="font-bold" style={{color: 'var(--green)'}}>IGUS STORE</span></h1>
                         <p className="" style={{color: 'var(--light-gray)' }}>Dive in & explore +100.000 games!</p>
@@ -83,7 +83,7 @@ export default function LoginPage() {
                         <div className="flex whitespace-nowrap">Need an account?<button onClick={handleSignUp} type="button" className="ml-2 cursor-pointer" style={{ color: 'var(--green)' }}>Register here</button></div>
                     </div>
                 </form>
-                <p className="text-white text-xs mx-auto mt-auto mb-5">Terms of Service | Privacy Policy</p>
+                <p className="text-white text-xs mx-auto mb-5">Terms of Service | Privacy Policy</p>
             </div>
         </div>
     )
