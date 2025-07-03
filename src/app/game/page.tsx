@@ -32,7 +32,7 @@ export default function GamePage() {
         if (!id) return;
         const fetchGame = async () => {
             const { data, error } = await supabaseClient
-                .from('game')
+                .from('game_with_image')
                 .select('*')
                 .eq('id', id)
                 .single();

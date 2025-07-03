@@ -21,27 +21,26 @@ export default function home(){
 
     useEffect(() => {
         const fetchGames = async () => {
-        const { data, error } = await supabaseClient
-            .from('game')
+            const { data, error } = await supabaseClient
+            .from('game_with_image')
             .select('*')
-            .range(0, 3);
+                if (error) {
+                    console.error("Error fetching games:", error);
+                    return;
+                }
 
-        if (error) {
-            console.error("Error fetching games:", error);
-            return;
-        }
-
-        const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-        const gamesWithImages = data.map((game: Game) => ({
+            const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+            const gamesWithImages = data.map((game: any) => ({
             ...game,
             image: `${baseUrl}/storage/v1/object/public/games/${game.image}`
-        }))
+            }));
 
-        setGames(gamesWithImages)
-        }
+            setGames(gamesWithImages);
+        };
 
-        fetchGames()
+        fetchGames();
     }, []);
+
 
     const gamesGrid = games.map((game) => {
         return(

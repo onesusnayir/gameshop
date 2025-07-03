@@ -1,3 +1,5 @@
+'use client'
+
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import { useRouter } from 'next/navigation'
@@ -36,10 +38,11 @@ export default function Slider({ games } : SliderProps){
             slidesPerView={1}
             navigation
             loop={true}
+            className='w-full'
             >
         {games.length > 0 && games.map((game) => (
           <SwiperSlide key={game.id}>
-            <div className="relative h-[600px] text-white overflow-hidden bg-no-repeat bg-cover bg-center flex flex-col justify-end" style={{ backgroundImage: `url(${game.image})` }}>
+            <div className="relative h-[600px] text-white overflow-hidden bg-no-repeat bg-cover flex flex-col justify-end" style={{ backgroundImage: `url(${game.image})` }}>
                 <div className="absolute inset-0 bg-black opacity-20 z-0" />
                 <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-[#1D1D1D] to-transparent z-10" />
                 <div className="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-t from-[#1D1D1D] to-transparent z-10" />
