@@ -114,7 +114,7 @@ export default function GamePage() {
         <div className="min-h-[100vh]" style={{backgroundColor: 'var(--gray)'}}>
             <header>
                 <Navbar />
-                {banner.length > 0 &&
+                {banner.length > 0 ?
                     <Swiper
                         modules={[Navigation, Pagination, Autoplay]}
                         autoplay={{ delay: 5000,
@@ -137,6 +137,13 @@ export default function GamePage() {
                                 )
                             })}
                     </Swiper>
+                    :
+                    <div className="h-[600px]">
+                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" style={{color: 'var(--green)'}}>
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                        </svg>
+                    </div>
                 }
             </header>
             <main className="p-10 mt-10">

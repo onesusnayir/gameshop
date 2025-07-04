@@ -33,7 +33,7 @@ export default function Slider({ games } : SliderProps){
   
     return (
        <div className="w-full">
-        <Swiper
+       {games.length > 0 && ( <Swiper
             modules={[Navigation, Pagination, Autoplay]}
             autoplay={{ delay: 5000,
               disableOnInteraction: false,
@@ -58,7 +58,7 @@ export default function Slider({ games } : SliderProps){
             </div>
           </SwiperSlide>
         ))}
-      </Swiper>
+      </Swiper>)}
     </div>
     )
 }
