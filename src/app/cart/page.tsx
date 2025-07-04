@@ -1,10 +1,10 @@
 'use client'
 
-import Sidebar from "@/components/ui/sidebar"
+import Navbar from "@/components/ui/navbar";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import supabaseClient from "@/lib/supabaseClient";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 type Game = {
   id: string;
@@ -16,20 +16,21 @@ type Game = {
 }
 
 export default function cartPage(){
-    const [cartItems, setCartItems] = useState<Game[]>([]);
+    const [games, setGames] = useState<Game[]>([]);
+    const [isLogin, setIsLogin] = useState(false)
     const router = useRouter();
 
     useEffect(() => {
         const checkSession = async () => {
-        const { data: { session } } = await supabaseClient.auth.getSession()
-        console.log(session)
-            if (!session) {
-                router.push('/login')
+            const { data: { session } } = await supabaseClient.auth.getSession()
+            if (session) {
+                setIsLogin(true)
             }
         }
 
         checkSession()
     }, [])
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -52,37 +53,59 @@ export default function cartPage(){
             }
             // Get Game
             const { data: gameData, error: gameError } = await supabaseClient
-                .from('game')
+                .from('game_with_image')
                 .select('*')
                 .in('id', data.map((item: any) => item.game_id));
+                
+                            if (gameError) {
+                                console.error("Error fetching games:", gameError);
+                                return;
+                            }
 
-            if (gameError) {
-                console.error("Error fetching games:", gameError);
-                return;
-            }
-            setCartItems(gameData);
-            { cartItems.length > 0 ? <div>{cartElements}</div>: <p>You cart is empty</p>}
+            const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+            const gamesWithImages = gameData?.map((game) => ({
+                ...game,
+                image: `${baseUrl}/storage/v1/object/public/games/${game.image}`
+            }));
+            setGames(gamesWithImages);
         }
 
         fetchData();
     },[])
 
-    const cartElements = cartItems.map((item) => (
-        <div key={item.id} className="flex border-b-2 border-gray-200 py-5 gap-5 items-center">
-            <span onClick={() => handleDeleteItem(item.id)} className="material-symbols-outlined text-orange-300 cursor-pointer">delete</span>
-            <div onClick={ () => handleItemsClick(item.id) } className="cursor-pointer flex gap-5">
-                <Image 
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/games/${item.image}`} 
-                alt={item.name}
-                width={100}
-                height={100}/>
-                <div>
-                    <h1>{item.name}</h1>
-                    <p>{`Rp. ${item.price}`}</p>
+    const handleClick = (id: string) => {
+        router.push(`/game?id=${id}`);
+    }
+
+    const gamesList = games.map((game) => {
+            return(
+                <div key={game.id} className="w-full flex" style={{backgroundColor: 'var(--dark-gray)'}}>
+                    <div key={game.id} onClick={() => handleClick(game.id)} className="relative w-[300px] h-[200px] cursor-pointer">
+                        <Image 
+                        src={game.image} 
+                        alt={game.name} 
+                        fill
+                        className="object-cover"
+                        />
+                    </div>
+                    <div className="flex p-5 w-full justify-between">
+                        <div className="grow max-w-[450px] flex flex-col justify-start gap-3">
+                            <h1 className="text-white text-3xl ">{game.name}</h1>
+                            <p className="line-clamp-2 text-sm" style={{color: 'var(--light-gray)'}}>{game.description}</p>
+                            <div className="flex gap-5">
+                                <button onClick={() => handleClick(game.id)} className="rounded-sm py-2 px-4 cursor-pointer" style={{backgroundColor: 'var(--green)'}}>Go to Store</button>
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-end justify-end">
+                            <button onClick={() => handleDeleteItem(game.id)} className="mb-auto cursor-pointer">
+                                <span className="material-symbols-outlined text-white text-xl ml-4">close</span>
+                            </button>
+                            <p className="text-2xl" style={{color: 'var(--green)'}}>{'Rp '+game.price}</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    ));
+            )
+        })
 
     const handleItemsClick = (game_id : string) => {
         router.push(`/game?id=${game_id}`);
@@ -110,16 +133,48 @@ export default function cartPage(){
         }
 
         // Refresh Cart
-        setCartItems(cartItems.filter(item => item.id !== game_id));
+        setGames(games.filter(item => item.id !== game_id));
     }
 
     return (
-        <div>
-            <Sidebar />
-            <div className="ml-[200px] p-5">
-                <h1 className="text-orange-400 font-bold text-2xl">Your Cart</h1>
-                { cartItems.length > 0 ? <div>{cartElements}</div>: <p>You cart is empty</p>}
-            </div>
+        <div className="min-h-screen flex flex-col" style={{backgroundColor: 'var(--gray)'}}>
+            <header>
+                <Navbar />
+            </header>
+            {
+                isLogin ?
+                <main className="flex-1 flex-col flex mt-[60px]">
+                    <div className="p-10 flex flex-col flex-1 items-center gap-3">
+                        <h1 className="text-white font-semibold text-2xl mb-5 w-full text-start">Your Cart</h1>
+                        {games.length > 0 && gamesList}
+                    </div>
+                    <footer className="bg-black p-5 flex justify-between items-center">
+                        <h1 className="text-white">{'Total '+games.length+' items'}</h1>
+                        <div className="flex gap-5">
+                            <div>
+                                <p className="text-white">Total Price</p>
+                                <p style={{color: 'var(--green)'}}>{+games.length > 0 ? 'Rp '+games.reduce((acc, game) => acc + game.price, 0) : 'Rp '+0}</p>
+                            </div>
+                            <button className="color-white rounded-sm px-4" style={{backgroundColor: 'var(--green)'}}>Pay Now</button>
+                        </div>
+                    </footer>
+                </main>
+                :
+                <main className="pt-[60px] h-full flex flex-col justify-center flex-1">
+                    <div className="flex-1 flex flex-col items-center justify-center">
+                        <h2 className="text-xl font-semibold" style={{color: 'var(--green)'}}>Please Login</h2>
+                        <p className="text-white">Join us and log in to see your cart</p>
+                    </div>
+                    <div className="flex justify-center">
+                        <div className="relative w-[383px] h-[33px]">
+                            <Image
+                                src={'/copyright.png'}
+                                fill
+                                alt="copyright"/>
+                        </div>
+                    </div>
+                </main>
+            }
         </div>
     )
 }

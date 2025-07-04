@@ -56,7 +56,7 @@ export default function Navbar () {
         router.push('/cart')
     }
     return(
-        <nav className="fixed top-0 z-50 w-full p-5 flex gap-5 text-white items-center justify-around" style={{ backgroundColor: '#000000' }}>
+        <nav className="max-h-[60px] fixed top-0 z-50 w-full p-5 flex gap-5 text-white items-center justify-around" style={{ backgroundColor: '#000000' }}>
             <Image 
             src={'/icon.svg'}
             width={50}

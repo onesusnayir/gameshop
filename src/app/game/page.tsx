@@ -27,11 +27,18 @@ type Banner = {
     image: string;
 }
 
+type Genre = {
+    id: string;
+    genre: string;
+}
+
 export default function GamePage() {
     const [id, setId] = useState<string | null>(null);
     const [ game, setGame ] = useState<Game>();
     const [ banner, setBanner] = useState<Banner[]>([])
+    const [genre, setGenre] = useState<Genre[]>([])
     const router = useRouter()
+    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
     useEffect(() => {
     if (typeof window !== "undefined") {
@@ -42,7 +49,6 @@ export default function GamePage() {
     }, []);
 
     useEffect(() => {
-            const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
             if (!id) return;
             const fetchGame = async () => {
             const { data: gameData, error: dataGameError } = await supabaseClient
@@ -50,8 +56,6 @@ export default function GamePage() {
             .select('*')
             .eq('id', id)
             .single()
-
-            console.log("banner"+gameData)
 
             if (dataGameError) {
                 console.error("Error fetching games:", dataGameError.message);
@@ -64,14 +68,22 @@ export default function GamePage() {
             }
 
             setGame(gameWithImage)
-            
+        }
+
+        fetchGame();
+    },[id])
+
+    useEffect(() => {
+        const fetchBanner = async ()=> {
+            if (!id) return;
+                        
             const { data: bannerData, error: errorBannerData } = await supabaseClient
             .from('banner_with_filename')
             .select('id, object_filename')
             .eq('id_game', id)
             
             if(errorBannerData){
-                console.error("Error fetching banner::", errorBannerData.message);
+                console.error("Error fetching banner:", errorBannerData.message);
                 return;
             }
             
@@ -79,13 +91,31 @@ export default function GamePage() {
                 ...banner, 
                 image: `${baseUrl}/storage/v1/object/public/banner/${banner.object_filename}`
             }))
-
-            console.log(banners)
+            
             setBanner(banners)
         }
 
-        fetchGame();
-    },[id])
+        fetchBanner()
+    }, [id])
+
+    useEffect(()=> {
+        const fetchGenre = async () => {
+            if (!id) return;
+
+            const { data, error } = await supabaseClient
+            .from('genre')
+            .select('id, genre')
+            .eq('id_game', id)
+
+            if (error) {
+                console.error('Error fetching genre:', error)
+            } else {
+                setGenre(data)
+            }
+        }
+
+        fetchGenre()
+    }, [id])
 
     const handleBuy = () => {
         router.push(`/checkout?id=${id}`);
@@ -161,14 +191,19 @@ export default function GamePage() {
                             </div>
                         }
                         <div className="flex p-2 gap-3 mt-5">
-                            <button className="flex-1 px-3 py-1 text-nowrap rounded-sm" style={{backgroundColor: 'var(--green)'}}>+ Wishlist</button>
-                            <button className="flex-1 px-3 py-1 text-nowrap rounded-sm" style={{backgroundColor: 'var(--green)'}}>+ Cart</button>
+                            <button className="flex-1 px-3 py-1 text-nowrap rounded-sm font-semibold" style={{backgroundColor: 'var(--green)'}}>+ Wishlist</button>
+                            <button onClick={handleCart} className="flex-1 px-3 py-1 text-nowrap rounded-sm font-semibold cursor-pointer" style={{backgroundColor: 'var(--green)'}}>+ Cart</button>
                         </div>
                     </div>
                     <div className="flex-1 px-5 flex flex-col justify-between">
                         <div>
                             <h1 className="text-3xl text-white">{game?.name}</h1>
-                            <p style={{color: 'var(--light-gray)'}}>{game?.description}</p>
+                            <p className="text-justify" style={{color: 'var(--light-gray)'}}>{game?.description}</p>
+                            {genre.length > 0 && 
+                            <div className="flex gap-3 mt-2">
+                                {genre.map((item) => <p className="text-white px-3 py-1 rounded-sm bg-[#626262]" key={item.id}>{item.genre}</p>)}
+                            </div>
+                            }
                         </div>
                         <div className="w-full flex justify-between items-center">
                             <p style={{color: 'var(--light-gray)'}}>{game?.developer}</p>

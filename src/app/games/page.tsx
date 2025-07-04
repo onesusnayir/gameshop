@@ -46,6 +46,27 @@ export default function GamesPage() {
         router.push(`/game?id=${id}`);
     }
 
+    const handleCart = async (game_id: string) => {
+        const { data: userData, error: userError } = await supabaseClient.auth.getUser()
+        if (userError) {
+            console.error("Error fetching user:", userError);
+            alert("You should login first");
+            return;
+        }
+        const userId = userData?.user?.id;
+        
+        const { data, error } = await supabaseClient
+            .from('cart')
+            .insert({
+                game_id: game_id,
+                user_id: userId,
+            });
+            
+        if (error) {
+            return
+        }
+    }
+
     const gamesList = games.map((game) => {
         return(
             <div key={game.id} className="w-full flex" style={{backgroundColor: 'var(--dark-gray)'}}>
@@ -60,10 +81,10 @@ export default function GamesPage() {
                 <div className="flex p-5 w-full justify-between">
                     <div className="grow max-w-[450px] flex flex-col justify-center gap-3">
                         <h1 className="text-white text-3xl ">{game.name}</h1>
-                        <p className="" style={{color: 'var(--light-gray)'}}>{game.description}</p>
-                        <div className="flex px-5 gap-5">
+                        <p className="line-clamp-2 text-sm" style={{color: 'var(--light-gray)'}}>{game.description}</p>
+                        <div className="flex gap-5">
                             <button onClick={() => handleClick(game.id)} className="flex-1 rounded-sm p-2 cursor-pointer" style={{backgroundColor: 'var(--green)'}}>Go to Store</button>
-                            <button className="flex-1 rounded-sm p-2 cursor-pointer" style={{backgroundColor: 'var(--green)'}}>Add to cart</button>
+                            <button onClick={() => handleCart(game.id)} className="flex-1 rounded-sm p-2 cursor-pointer" style={{backgroundColor: 'var(--green)'}}>Add to cart</button>
                         </div>
                     </div>
                     <div className="p-5 flex flex-col items-end justify-end">
@@ -79,7 +100,7 @@ export default function GamesPage() {
             <header>
                 <Navbar />
             </header>
-            <main className="mt-[80px] pt-5 px-10">
+            <main className="mt-[60px] pt-5 px-10">
                 <h1 className="text-white font-semibold text-2xl mb-5">All Games</h1>
                 <div className="flex flex-col items-center gap-3">
                     {games.length > 0 && gamesList}

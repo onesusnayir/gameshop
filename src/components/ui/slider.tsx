@@ -52,7 +52,7 @@ export default function Slider({ games } : SliderProps){
                 <div className='relative flex flex-col gap-1 items-start max-w-[50%] p-10 z-20'>
                     <p className='px-5 py-2 w-fit text-xs' style={{ backgroundColor: 'var(--gray)'}}>Latest Relases Games</p>
                     <h1 className='text-6xl font-semibold'>{game.name}</h1>
-                    <p className='' style={{color: 'var(--light-gray)'}}>{game.description}</p>
+                    <p className='line-clamp-2' style={{color: 'var(--light-gray)'}}>{game.description}</p>
                     <button onClick={() => handleMoveGame(game.id)} className='px-4 py-1 text-black rounded-sm cursor-pointer' style={{ backgroundColor: 'var(--green)'}}>Go to Store</button>
                 </div>
             </div>

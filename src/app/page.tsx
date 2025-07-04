@@ -46,7 +46,7 @@ export default function home(){
         <div className='min-h-[100vh]' style={{ backgroundColor: 'var(--gray)'}}>
             <header>
                 <Navbar />
-                <div className='mt-[80px]'>
+                <div className='mt-[60px]'>
                     {/* <Slider /> */}
                     <Slider games={games}/>
                 </div>
