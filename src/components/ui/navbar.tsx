@@ -1,7 +1,44 @@
+'use client'
+
+import supabaseClient from "@/lib/supabaseClient";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+type User = {
+  id: string;
+  username: string;
+}
+
 
 export default function Navbar () {
+    const [ user, setUser ] = useState<User>()
+
+    useEffect(() => {
+        const fetchSession = async () => {
+            const {data , error } = await supabaseClient.auth.getUser()
+
+            if (error) {
+                console.error('Gagal mengambil sesi:', error)
+                return
+            }
+            if (data) {
+                console.log(data)
+            } 
+            const {data: userData , error: usernameError} = await supabaseClient
+            .from('user')
+            .select('id, username')
+            .eq('auth_id',data.user.id)
+            .single();
+
+            if(!usernameError){
+                setUser(userData)
+            }
+        }
+
+        fetchSession()
+    }, [])
+
     const router = useRouter()
     const handleLogin = () => {
         router.push('/login')
@@ -19,7 +56,7 @@ export default function Navbar () {
         router.push('/cart')
     }
     return(
-        <nav className="fixed top-0 z-50 w-full p-5 flex gap-5 text-white items-center justify-around" style={{ backgroundColor: 'var(--gray)' }}>
+        <nav className="fixed top-0 z-50 w-full p-5 flex gap-5 text-white items-center justify-around" style={{ backgroundColor: '#000000' }}>
             <Image 
             src={'/icon.svg'}
             width={50}
@@ -38,7 +75,11 @@ export default function Navbar () {
                 </button>
                 <input className="grow px-4 py-2 border-none outline-none rounded-sm" type="text" placeholder="Search"/>
             </div>
+            {user ? 
+            <p>{user.username}</p>
+            :
             <button onClick={handleLogin} className="px-6 py-2 rounded-sm text-black cursor-pointer" style={{ backgroundColor: 'var(--green)'}}>Log in</button>
+            }
         </nav>
     )
 }

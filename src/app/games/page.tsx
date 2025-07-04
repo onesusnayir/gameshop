@@ -1,8 +1,9 @@
 'use client';
 import { useState, useEffect, use } from "react";
 import supabaseClient from "@/lib/supabaseClient";
+import Navbar from "@/components/ui/navbar";
+import Footer from "@/components/ui/footer";
 import Image from "next/image";
-import Sidebar from "@/components/ui/sidebar";
 import { useRouter } from "next/navigation";
 
 type Game = {
@@ -21,7 +22,7 @@ export default function GamesPage() {
     useEffect(() => {
         const fetchGames = async () => {
             const { data, error } = await supabaseClient
-                .from('game')
+                .from('game_with_image')
                 .select('*');
 
             if (error) {
@@ -45,29 +46,46 @@ export default function GamesPage() {
         router.push(`/game?id=${id}`);
     }
 
-    const gameElements = games.map((game) => {
-        return (
-            <div onClick={ () => handleClick(game.id)} key={game.id} className="flex cursor-pointer">
-                <Image
-                src={game.image}
-                alt={game.name}
-                width={200}
-                height={200}
-                className="rounded-2xl"/>
-                <div className="ml-5">
-                    <h2 className="text-xl font-bold text-orange-400">{game.name}</h2>
-                    <p className="line-clamp-1">{game.description}</p>
-                    <p>{game.price}</p>
+    const gamesList = games.map((game) => {
+        return(
+            <div key={game.id} className="w-full flex" style={{backgroundColor: 'var(--dark-gray)'}}>
+                <div key={game.id} onClick={() => handleClick(game.id)} className="relative w-[300px] h-[200px] cursor-pointer">
+                    <Image 
+                    src={game.image} 
+                    alt={game.name} 
+                    fill
+                    className="object-cover"
+                    />
+                </div>
+                <div className="flex p-5 w-full justify-between">
+                    <div className="grow max-w-[450px] flex flex-col justify-center gap-3">
+                        <h1 className="text-white text-3xl ">{game.name}</h1>
+                        <p className="" style={{color: 'var(--light-gray)'}}>{game.description}</p>
+                        <div className="flex px-5 gap-5">
+                            <button onClick={() => handleClick(game.id)} className="flex-1 rounded-sm p-2 cursor-pointer" style={{backgroundColor: 'var(--green)'}}>Go to Store</button>
+                            <button className="flex-1 rounded-sm p-2 cursor-pointer" style={{backgroundColor: 'var(--green)'}}>Add to cart</button>
+                        </div>
+                    </div>
+                    <div className="p-5 flex flex-col items-end justify-end">
+                        <button className="text-white">add to wishlist</button>
+                        <p className="text-2xl" style={{color: 'var(--green)'}}>{'Rp '+game.price}</p>
+                    </div>
                 </div>
             </div>
         )
     })
     return(
-        <div>
-            <Sidebar />
-            <div className="ml-[200px] flex flex-col gap-5 p-5">
-                {gameElements.length > 0 && gameElements}
-            </div>
+        <div className="min-h-[100vh] w-full" style={{backgroundColor: 'var(--gray)'}}>
+            <header>
+                <Navbar />
+            </header>
+            <main className="mt-[80px] pt-5 px-10">
+                <h1 className="text-white font-semibold text-2xl mb-5">All Games</h1>
+                <div className="flex flex-col items-center gap-3">
+                    {games.length > 0 && gamesList}
+                </div>
+            </main>
+            <Footer />
         </div>
     )
 }
