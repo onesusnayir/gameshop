@@ -19,7 +19,6 @@ export default function Navbar () {
             const {data , error } = await supabaseClient.auth.getUser()
 
             if (error) {
-                console.error('Gagal mengambil sesi:', error)
                 return
             }
             if (data) {

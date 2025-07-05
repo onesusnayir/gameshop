@@ -41,16 +41,19 @@ export default function GamePage() {
     const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
     useEffect(() => {
-    if (typeof window !== "undefined") {
-        const searchParams = new URLSearchParams(window.location.search);
-        const gameId = searchParams.get('id');
-        setId(gameId);
-    }
+        const getGameId = () => {
+            const searchParams = new URLSearchParams(window.location.search);
+            const gameId = searchParams.get('id');
+            setId(gameId);
+        }
+        if (typeof window !== "undefined") {
+            getGameId()
+        }
     }, []);
 
     useEffect(() => {
-            if (!id) return;
-            const fetchGame = async () => {
+        if (!id) return;
+        const fetchGame = async () => {
             const { data: gameData, error: dataGameError } = await supabaseClient
             .from('game_with_image')
             .select('*')
@@ -118,7 +121,11 @@ export default function GamePage() {
     }, [id])
 
     const handleBuy = () => {
-        router.push(`/checkout?id=${id}`);
+        sessionStorage.removeItem("selectedGameIds");
+        const selectedGameIds = [id];
+
+        sessionStorage.setItem("selectedGameIds", JSON.stringify(selectedGameIds));
+        router.push('/checkout')
     }
 
     const handleCart = async () => {
@@ -201,7 +208,7 @@ export default function GamePage() {
                             <p className="text-justify" style={{color: 'var(--light-gray)'}}>{game?.description}</p>
                             {genre.length > 0 && 
                             <div className="flex gap-3 mt-2">
-                                {genre.map((item) => <p className="text-white px-3 py-1 rounded-sm bg-[#626262]" key={item.id}>{item.genre}</p>)}
+                                {genre.map((item, index) => <p className="text-white px-3 py-1 rounded-sm bg-[#626262]" key={item.id}>{item.genre}</p>)}
                             </div>
                             }
                         </div>
@@ -209,7 +216,7 @@ export default function GamePage() {
                             <p style={{color: 'var(--light-gray)'}}>{game?.developer}</p>
                             <div className="p-3 flex gap-3 items-center" style={{backgroundColor: 'var(--dark-gray)'}}>
                                 <p className="text-xl" style={{color: 'var(--green)'}}>{'Rp '+game?.price}</p>
-                                <button className="px-4 py-2 rounded-sm text-black font-semibold" style={{backgroundColor: 'var(--green)'}}>BUY NOW</button>
+                                <button onClick={handleBuy} className="px-4 py-2 rounded-sm text-black font-semibold" style={{backgroundColor: 'var(--green)'}}>BUY NOW</button>
                             </div>
                         </div>
                     </div>

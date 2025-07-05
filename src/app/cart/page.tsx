@@ -37,7 +37,6 @@ export default function cartPage(){
             // Get Id User
             const { data: userData, error: userError } = await supabaseClient.auth.getUser()
             if (userError) {
-                console.error("Error fetching user:", userError);
                 return;
             }
             const userId = userData?.user?.id;
@@ -75,6 +74,14 @@ export default function cartPage(){
 
     const handleClick = (id: string) => {
         router.push(`/game?id=${id}`);
+    }
+
+    const handleBuy = () => {
+        sessionStorage.removeItem("selectedGameIds");
+        const selectedGameIds = [games.map((game) => game.id)];
+
+        sessionStorage.setItem("selectedGameIds", JSON.stringify(selectedGameIds));
+        router.push('/checkout')
     }
 
     const gamesList = games.map((game) => {
@@ -155,7 +162,7 @@ export default function cartPage(){
                                 <p className="text-white">Total Price</p>
                                 <p style={{color: 'var(--green)'}}>{+games.length > 0 ? 'Rp '+games.reduce((acc, game) => acc + game.price, 0) : 'Rp '+0}</p>
                             </div>
-                            <button className="color-white rounded-sm px-4" style={{backgroundColor: 'var(--green)'}}>Pay Now</button>
+                            <button onClick={handleBuy} className="color-white rounded-sm px-4" style={{backgroundColor: 'var(--green)'}}>Pay Now</button>
                         </div>
                     </footer>
                 </main>
