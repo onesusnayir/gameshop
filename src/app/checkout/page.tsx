@@ -262,7 +262,7 @@ export default function Checkout() {
                         })}
                     </p>
                 </div>
-                <button className="w-full p-2 font-semibold my-4 rounded" style={{backgroundColor: 'var(--green)'}}>PROCEED TO PAY</button>
+                <button className="w-full p-2 font-semibold my-4 rounded cursor-pointer" style={{backgroundColor: 'var(--green)'}}>PROCEED TO PAY</button>
                </section>
             </main>
         </div>

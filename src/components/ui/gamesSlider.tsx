@@ -29,12 +29,13 @@ export default function gamesSlider({ games } : SliderProps){
        <div className="w-full">
         <Swiper
             modules={[Navigation, Pagination, Autoplay]}
-            slidesPerView="auto"
-            spaceBetween={10}
+            slidesPerView={'auto'}
+            spaceBetween={20}
+            navigation
             >
         {games.length > 0 && games.map((game) => (
-          <SwiperSlide key={game.id} style={{ width: '200px' }}>
-            <div key={game.id} onClick={() => handleMoveGame(game.id)} className="relative h-[400px] w-[200px] bg-no-repeat bg-cover flex flex-col justify-end cursor-pointer" style={{ backgroundImage: `url(${game.image})` }}>
+          <SwiperSlide key={game.id} className='!w-[250px]'>
+            <div key={game.id} onClick={() => handleMoveGame(game.id)} className="relative h-[400px] w-full bg-no-repeat bg-cover bg-center flex flex-col justify-end cursor-pointer" style={{ backgroundImage: `url(${game.image})` }}>
                 <div className="absolute bottom-12 left-0 w-full h-10 bg-gradient-to-t from-[#1D1D1D] to-transparent z-10" />
                 <div className='relative p-4 z-20' style={{ backgroundColor: 'var(--gray)'}}>
                     <h1 className='font-semibold text-[14px] text-white text-nowrap'>{game.name}</h1>

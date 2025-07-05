@@ -17,8 +17,15 @@ type Game = {
   image: string;
 }
 
+type Banner = {
+    id: string;
+    idGame: string;
+    image: string;
+}
+
 export default function home(){
     const [ games, setGames ] = useState<Game[]>([]);
+    const [ banner, setBanner ] = useState<Banner[]>([])
 
     useEffect(() => {
         const fetchGames = async () => {
@@ -42,13 +49,38 @@ export default function home(){
         fetchGames();
     }, []);
 
+    useEffect(() => {
+        const fetchBanner = async () => {
+            const { data, error } = await supabaseClient
+            .from('banner_with_filename')
+            .select('id, object_filename, id_game')
+
+            if(error){
+                return console.error(error.message)
+            }
+            
+            const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+            const bannerWithImage = data.map((item) => {
+                return {
+                    id: item.id,
+                    idGame: item.id_game,
+                    image: `${baseUrl}/storage/v1/object/public/banner/${item.object_filename}`
+                }
+            })
+            console.log(bannerWithImage)
+            setBanner(bannerWithImage)
+        }
+
+        fetchBanner()
+    }, [])
+
     return (
         <div className='min-h-[100vh]' style={{ backgroundColor: 'var(--gray)'}}>
             <header>
                 <Navbar />
                 <div className='mt-[60px]'>
                     {/* <Slider /> */}
-                    <Slider games={games}/>
+                    <Slider games={games} banner={banner}/>
                 </div>
             </header>
             <main className='mt-10 px-5'>
