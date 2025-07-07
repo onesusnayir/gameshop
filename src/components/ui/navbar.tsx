@@ -21,9 +21,7 @@ export default function Navbar () {
             if (error) {
                 return
             }
-            if (data) {
-                console.log(data)
-            } 
+
             const {data: userData , error: usernameError} = await supabaseClient
             .from('user')
             .select('id, username')
@@ -48,11 +46,14 @@ export default function Navbar () {
     const handleGames = () => {
         router.push('/games')
     }
-    // const handleWishlist = () => {
-    //     router.push('/login')
-    // }
+    const handleWishlist = () => {
+        router.push('/wishlist')
+    }
     const handleCart = () => {
         router.push('/cart')
+    }
+    const handleClick = () => {
+        router.push('/profile')
     }
     return(
         <nav className="max-h-[60px] fixed top-0 z-50 w-full p-5 flex gap-5 text-white items-center justify-around" style={{ backgroundColor: '#000000' }}>
@@ -65,7 +66,7 @@ export default function Navbar () {
             <ul className="grow max-w-[500px] flex justify-around">
                 <li onClick={handleHome} ><button className="cursor-pointer">Home</button></li>
                 <li onClick={handleGames}><button className="cursor-pointer">Game</button></li>
-                <li  className=""><button>Wishlist</button></li>
+                <li onClick={handleWishlist}><button className="cursor-pointer">Wishlist</button></li>
                 <li onClick={handleCart}><button className="cursor-pointer">Cart</button></li>
             </ul>
             <div className="flex min-w-[300px] rounded-sm items-center" style={{ backgroundColor: 'var(--dark-gray)' }}>
@@ -75,7 +76,7 @@ export default function Navbar () {
                 <input className="grow px-4 py-2 border-none outline-none rounded-sm" type="text" placeholder="Search"/>
             </div>
             {user ? 
-            <p>{user.username}</p>
+            <p className="cursor-pointer" onClick={handleClick}>{user.username}</p>
             :
             <button onClick={handleLogin} className="px-6 py-2 rounded-sm text-black cursor-pointer" style={{ backgroundColor: 'var(--green)'}}>Log in</button>
             }

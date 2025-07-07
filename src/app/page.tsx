@@ -11,15 +11,17 @@ import { useState, useEffect } from 'react'
 type Game = {
   id: string;
   name: string;
-  description: string;
   price: number;
-  developer: string;
   image: string;
 }
 
 type Banner = {
     id: string;
-    idGame: string;
+    game: {
+        id: string,
+        name: string;
+        description: string;
+    };
     image: string;
 }
 
@@ -30,8 +32,8 @@ export default function home(){
     useEffect(() => {
         const fetchGames = async () => {
             const { data, error } = await supabaseClient
-            .from('game_with_image')
-            .select('*')
+            .from('game_view')
+            .select('id, name, price, image_filename')
                 if (error) {
                     console.error("Error fetching games:", error);
                     return;
@@ -40,7 +42,7 @@ export default function home(){
             const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
             const gamesWithImages = data.map((game: any) => ({
             ...game,
-            image: `${baseUrl}/storage/v1/object/public/games/${game.image}`
+            image: `${baseUrl}/storage/v1/object/public/games/${game.image_filename}`
             }));
 
             setGames(gamesWithImages);
@@ -52,8 +54,8 @@ export default function home(){
     useEffect(() => {
         const fetchBanner = async () => {
             const { data, error } = await supabaseClient
-            .from('banner_with_filename')
-            .select('id, object_filename, id_game')
+            .from('banner_view')
+            .select('id, name, description, image_filename, game_id')
 
             if(error){
                 return console.error(error.message)
@@ -63,11 +65,15 @@ export default function home(){
             const bannerWithImage = data.map((item) => {
                 return {
                     id: item.id,
-                    idGame: item.id_game,
-                    image: `${baseUrl}/storage/v1/object/public/banner/${item.object_filename}`
+                    game: {
+                        id: item.game_id,
+                        name: item.name,
+                        description: item.description,
+                    },
+                    image: `${baseUrl}/storage/v1/object/public/banner/${item.image_filename}`
                 }
             })
-            console.log(bannerWithImage)
+
             setBanner(bannerWithImage)
         }
 
@@ -80,7 +86,7 @@ export default function home(){
                 <Navbar />
                 <div className='mt-[60px]'>
                     {/* <Slider /> */}
-                    <Slider games={games} banner={banner}/>
+                    <Slider banner={banner}/>
                 </div>
             </header>
             <main className='mt-10 px-5'>

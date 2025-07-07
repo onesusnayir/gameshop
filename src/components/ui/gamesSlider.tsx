@@ -9,11 +9,9 @@ import 'swiper/css/pagination';
 type Game = {
   id: string;
   name: string;
-  description: string;
   price: number;
-  developer: string;
   image: string;
-};
+}
 
 interface SliderProps {
   games: Game[];

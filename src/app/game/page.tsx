@@ -19,6 +19,7 @@ type Game = {
   description: string;
   price: number;
   developer: string;
+  genre: string[];
   image: string;
 }
 
@@ -27,16 +28,10 @@ type Banner = {
     image: string;
 }
 
-type Genre = {
-    id: string;
-    genre: string;
-}
-
 export default function GamePage() {
     const [id, setId] = useState<string | null>(null);
     const [ game, setGame ] = useState<Game>();
     const [ banner, setBanner] = useState<Banner[]>([])
-    const [genre, setGenre] = useState<Genre[]>([])
     const router = useRouter()
     const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -55,8 +50,8 @@ export default function GamePage() {
         if (!id) return;
         const fetchGame = async () => {
             const { data: gameData, error: dataGameError } = await supabaseClient
-            .from('game_with_image')
-            .select('*')
+            .from('game_view')
+            .select('id, name, description, price, developer, genre, image_filename')
             .eq('id', id)
             .single()
 
@@ -67,7 +62,7 @@ export default function GamePage() {
             
             const gameWithImage = {
                 ...gameData,
-                image:  `${baseUrl}/storage/v1/object/public/games/${gameData.image}`
+                image:  `${baseUrl}/storage/v1/object/public/games/${gameData.image_filename}`
             }
 
             setGame(gameWithImage)
@@ -81,9 +76,9 @@ export default function GamePage() {
             if (!id) return;
                         
             const { data: bannerData, error: errorBannerData } = await supabaseClient
-            .from('banner_with_filename')
-            .select('id, object_filename')
-            .eq('id_game', id)
+            .from('banner_view')
+            .select('id, image_filename')
+            .eq('game_id', id)
             
             if(errorBannerData){
                 console.error("Error fetching banner:", errorBannerData.message);
@@ -92,32 +87,13 @@ export default function GamePage() {
             
             const banners = bannerData.map((banner: any) => ({
                 ...banner, 
-                image: `${baseUrl}/storage/v1/object/public/banner/${banner.object_filename}`
+                image: `${baseUrl}/storage/v1/object/public/banner/${banner.image_filename}`
             }))
             
             setBanner(banners)
         }
 
         fetchBanner()
-    }, [id])
-
-    useEffect(()=> {
-        const fetchGenre = async () => {
-            if (!id) return;
-
-            const { data, error } = await supabaseClient
-            .from('genre')
-            .select('id, genre')
-            .eq('id_game', id)
-
-            if (error) {
-                console.error('Error fetching genre:', error)
-            } else {
-                setGenre(data)
-            }
-        }
-
-        fetchGenre()
     }, [id])
 
     const handleBuy = () => {
@@ -206,9 +182,9 @@ export default function GamePage() {
                         <div>
                             <h1 className="text-3xl text-white">{game?.name}</h1>
                             <p className="text-justify" style={{color: 'var(--light-gray)'}}>{game?.description}</p>
-                            {genre.length > 0 && 
+                            { game && game.genre.length > 0 && 
                             <div className="flex gap-3 mt-2">
-                                {genre.map((item, index) => <p className="text-white px-3 py-1 rounded-sm bg-[#626262]" key={item.id}>{item.genre}</p>)}
+                                {game.genre.map((item, index) => <p className="text-white px-3 py-1 rounded-sm bg-[#626262]" key={index}>{item}</p>)}
                             </div>
                             }
                         </div>
@@ -216,7 +192,7 @@ export default function GamePage() {
                             <p style={{color: 'var(--light-gray)'}}>{game?.developer}</p>
                             <div className="p-3 flex gap-3 items-center" style={{backgroundColor: 'var(--dark-gray)'}}>
                                 <p className="text-xl" style={{color: 'var(--green)'}}>{'Rp '+game?.price}</p>
-                                <button onClick={handleBuy} className="px-4 py-2 rounded-sm text-black font-semibold" style={{backgroundColor: 'var(--green)'}}>BUY NOW</button>
+                                <button onClick={handleBuy} className="px-4 py-2 rounded-sm text-black font-semibold cursor-pointer" style={{backgroundColor: 'var(--green)'}}>BUY NOW</button>
                             </div>
                         </div>
                     </div>

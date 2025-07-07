@@ -22,9 +22,9 @@ type Game = {
 
 type Transaction = {
     id: string;
-    date: string;
     game: Game[];
     tax: number;
+    date: string;
     paymentFee: number;
     totalPrice: number;
 }
@@ -62,16 +62,16 @@ export default function Checkout() {
             const totalGamesPrice = data.reduce((sum, game) => sum + game.price, 0);
             const totalPrice = totalGamesPrice + (totalGamesPrice * tax) + 2500;
             const transactionTax = parseFloat((totalPrice * tax).toFixed(3));
+
             const newTransaction = {
-                id : idTransaction,
-                date: dateNow,
-                game: data,
-                tax: transactionTax,
-                paymentFee: 2500,
-                totalPrice: totalPrice,
+                    id : idTransaction,
+                    date: dateNow,
+                    game: data,
+                    tax: transactionTax,
+                    paymentFee: 2500,
+                    totalPrice: totalPrice,
             }
 
-            console.log(data)
             setGames(data)
             setTransaction(newTransaction)
         }
@@ -79,6 +79,27 @@ export default function Checkout() {
         fetchGames()
     }, []);
 
+    const handlePay = async () => {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const access_token = session?.access_token;
+
+        if(!transaction) return
+        const request = {
+            id: transaction.id,
+            games: transaction.game,
+            total_price: transaction.totalPrice,
+        }
+
+        const res = await fetch('/api/transactions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${access_token}`,
+            },
+            body: JSON.stringify(request),
+        });
+
+    }
 
     // const [game, setGame] = useState<Game | null>(null);
     // const [id, setId] = useState<string | null>(null);
@@ -262,7 +283,7 @@ export default function Checkout() {
                         })}
                     </p>
                 </div>
-                <button className="w-full p-2 font-semibold my-4 rounded cursor-pointer" style={{backgroundColor: 'var(--green)'}}>PROCEED TO PAY</button>
+                <button onClick={handlePay} className="w-full p-2 font-semibold my-4 rounded cursor-pointer" style={{backgroundColor: 'var(--green)'}}>PROCEED TO PAY</button>
                </section>
             </main>
         </div>

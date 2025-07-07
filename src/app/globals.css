@@ -19,6 +19,7 @@
 }
 
 
+
 :root {
   /* Set Font */
   font-family: 'Poppins', sans-serif;
@@ -30,6 +31,8 @@
   --gray: #1D1D1D;
   --dark-gray : #262626;
   --green: #AAFF68;
+  --light-green: #CCFFA4;
+
 }
 
 .swiper-button-next::after,

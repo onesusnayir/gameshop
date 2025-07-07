@@ -1,10 +1,13 @@
 'use client'
 import { useEffect, useState } from 'react'
 import supabaseClient from '@/lib/supabaseClient'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 export default function RegistrasiBerhasil() {
   const [username, setUsername] = useState<string | null>(null)
   const [inserted, setInserted] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search)
@@ -24,7 +27,6 @@ export default function RegistrasiBerhasil() {
       if (error) {
         console.error('Gagal insert:', error.message)
       } else {
-        console.log('User berhasil ditambahkan:', data)
         setInserted(true)
         clearInterval(interval)
       }
@@ -33,22 +35,43 @@ export default function RegistrasiBerhasil() {
     return () => clearInterval(interval)
   }, [inserted])
 
+  const loginHandler = () => {
+    router.push('/login')
+  }
+
   return (
-    <div className='w-full min-h-[100vh] flex items-center justify-center'>
-      <div className='w-[40%] h-auto text-black font-semibold text-4xl rounded-2xl' style={{backgroundColor: 'var(--light-gray)'}}>
-        {!inserted? 
-          <svg className="animate-spin h-5 w-5 text-blue-500" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+    <div className='w-full h-screen flex'>
+      <div className='w-[550px] h-full flex flex-col' style={{backgroundColor: 'var(--gray)'}}>
+        
+        {inserted? 
+          <svg className="animate-spin h-20 w-20" viewBox="0 0 24 24" style={{color: 'var(--green)'}}>
+            <path fill="currentColor" className="opacity-60" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
           </svg>
           :
-          <div>
-            <h1>Registrasi Berhasil</h1>
-            <p>Selamat datang, {username}!</p>
+          <div className='p-10 flex-1 flex flex-col items-start justify-center'>
+            <h1 className='text-2xl font-semibold' style={{color: 'var(--green)'}}>Success</h1>
+            <p className='text-white'>
+              Your account has successfully created, thanks for 
+              joining us, dive in & explore 100.000+ games!
+            </p>
+            <button onClick={loginHandler} className='w-full py-1 mt-5 rounded cursor-pointer' style={{backgroundColor: 'var(--green)'}}>BACK TO LOGIN</button>
           </div>
         }
+        <footer className='flex flex-col p-3'>
+          <div className='flex justify-center gap-3'>
+            <div className='relative w-[25px] h-[25px]'>
+              <Image
+              src={'/icon.svg'}
+              fill
+              alt='icon'
+              />
+            </div>
+            <p className='font-semibold' style={{color: 'var(--green)'}}>STORE</p>
+          </div>
+          <p className='text-white w-full text-center'>Terms Of Service | Privacy Policy</p>
+        </footer>
       </div>
-    
+      <div className='flex-1 bg-cover bg-center' style={{backgroundImage: 'url(/games_bg.jpg)'}}></div>
     </div>
   )
 }

@@ -37,32 +37,17 @@ export default function LoginPage() {
         }else{
             // 1. Ambil auth_id dari username
             const { data: userData, error: userError } = await supabaseClient
-            .from('user')
-            .select('auth_id')
+            .from('users_view')
+            .select('email')
             .eq('username', identifier)
             .single();
 
-            console.log(userData)
-            if (userError || !userData?.auth_id) {
+            if (userError || !userData?.email) {
                 throw new Error('Username tidak ditemukan');
             }
-
-            // 2. Ambil email dari auth.users berdasarkan auth_id
-            const { data: authUser, error: authError } = await supabaseClient
-            .from('auth_users')
-            .select('email')
-            .eq('id', userData.auth_id)
-            .single();
-
-            console.log(authUser?.email)
-
-            if (authError || !authUser?.email) {
-                throw new Error('Email tidak ditemukan untuk username ini');
-            }
-
             // 3. Login pakai email
             const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email: authUser.email,
+            email: userData.email,
             password,
             });
 

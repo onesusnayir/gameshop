@@ -11,7 +11,7 @@ type Game = {
   name: string;
   description: string;
   price: number;
-  developer: string;
+  genre: string[];
   image: string;
 }
 
@@ -43,46 +43,26 @@ export default function cartPage(){
 
             // Get Cart
             const { data, error } = await supabaseClient
-                .from('cart')
-                .select('*')
+                .from('cart_view')
+                .select('game_id, name, description, price, genre, image_filename')
                 .eq('user_id', userId);
+
             if (error) {
                 console.error("Error fetching cart:", error);
                 return;
             }
-            // Get Game
-            const { data: gameData, error: gameError } = await supabaseClient
-                .from('game_with_image')
-                .select('*')
-                .in('id', data.map((item: any) => item.game_id));
-                
-                            if (gameError) {
-                                console.error("Error fetching games:", gameError);
-                                return;
-                            }
 
             const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-            const gamesWithImages = gameData?.map((game) => ({
-                ...game,
-                image: `${baseUrl}/storage/v1/object/public/games/${game.image}`
+            const gamesWithImages = data?.map((item) => ({
+                ...item,
+                id: item.game_id,
+                image: `${baseUrl}/storage/v1/object/public/games/${item.image_filename}`
             }));
             setGames(gamesWithImages);
         }
 
         fetchData();
     },[])
-
-    const handleClick = (id: string) => {
-        router.push(`/game?id=${id}`);
-    }
-
-    const handleBuy = () => {
-        sessionStorage.removeItem("selectedGameIds");
-        const selectedGameIds = [games.map((game) => game.id)];
-
-        sessionStorage.setItem("selectedGameIds", JSON.stringify(selectedGameIds));
-        router.push('/checkout')
-    }
 
     const gamesList = games.map((game) => {
             return(
@@ -114,8 +94,16 @@ export default function cartPage(){
             )
         })
 
-    const handleItemsClick = (game_id : string) => {
-        router.push(`/game?id=${game_id}`);
+    const handleClick = (id: string) => {
+        router.push(`/game?id=${id}`);
+    }
+
+    const handleBuy = () => {
+        sessionStorage.removeItem("selectedGameIds");
+        const selectedGameIds = [games.map((game) => game.id)];
+
+        sessionStorage.setItem("selectedGameIds", JSON.stringify(selectedGameIds));
+        router.push('/checkout')
     }
 
     const handleDeleteItem = async (game_id: string) => {
