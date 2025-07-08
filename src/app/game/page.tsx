@@ -1,9 +1,12 @@
 'use client'
 
-import { useState, useEffect, use } from "react";
-import { useRouter } from 'next/navigation'
 import Navbar from "@/components/ui/navbar";
 import supabaseClient from "@/lib/supabaseClient";
+import ReviewComponent from "@/components/ui/review";
+import ReviewInput from "@/components/ui/reviewInput";
+import UserReview from "@/components/ui/userReview";
+import { useState, useEffect, use } from "react";
+import { useRouter } from 'next/navigation'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
@@ -28,10 +31,23 @@ type Banner = {
     image: string;
 }
 
+type Review = {
+    id: string;
+    user_id: string;
+    game_id: string;
+    username: string;
+    recomend: boolean;
+    review: string;
+    date: string;
+}
+
 export default function GamePage() {
     const [id, setId] = useState<string | null>(null);
     const [ game, setGame ] = useState<Game>();
-    const [ banner, setBanner] = useState<Banner[]>([])
+    const [ banner, setBanner] = useState<Banner[]>([]);
+    const [ reviews, setReviews] = useState<Review[]>([])
+    const [ reviewUser, setReviewUser] = useState<Review>()
+    const [refreshKey, setRefreshKey] = useState(0);
     const router = useRouter()
     const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -96,6 +112,66 @@ export default function GamePage() {
         fetchBanner()
     }, [id])
 
+    useEffect(() => {
+        const fetchReview = async () =>{
+            if (!id) return;
+                        
+            const { data: reviewData, error: errorReviewData } = await supabaseClient
+            .from('review_view')
+            .select('id, game_id, user_id, username, review, recomend, created_at')
+            .eq('game_id', id)
+            
+            if(errorReviewData){
+                console.error("Error fetching banner:", errorReviewData.message);
+                return;
+            }
+            
+            const reviews = reviewData.map((item: any) => ({
+                    id: item.id,
+                    user_id: item.user_id,
+                    username: item.username,
+                    recomend: item.recomend,
+                    review: item.review,
+                    date: item.created_at,
+                    game_id: item.game_id
+            }))
+            setReviews(reviews)
+
+            const { data: userData, error: userError } = await supabaseClient.auth.getUser()
+            if (userError) {
+                console.error("Error fetching user:", userError);
+                return;
+            }
+            const userId = userData?.user?.id;
+
+            const reviewUser = reviews.find(
+                (r) => r.user_id === userId && r.game_id === id
+            );
+
+            if(reviewUser) setReviewUser(reviewUser)
+        }
+
+        fetchReview()
+    },[id, refreshKey])
+
+    const reviewInput = async() => {
+        const { data: userData, error: userError } = await supabaseClient.auth.getUser()
+            if (userError) {
+                console.error("Error fetching user:", userError);
+                return;
+            }
+        const userId = userData?.user?.id;
+        const reviewUser = reviews.find(
+            (r) => r.user_id === userId && r.game_id === id
+        );
+
+        if(reviewUser){
+            return <UserReview recomend={reviewUser.recomend} date={reviewUser.date} review={reviewUser.review}/>
+        }else if(!reviewUser){
+            return <ReviewInput handlePostReview={handlePostReview}/>
+        }
+    }
+
     const handleBuy = () => {
         sessionStorage.removeItem("selectedGameIds");
         const selectedGameIds = [id];
@@ -117,11 +193,39 @@ export default function GamePage() {
             .insert({
                 game_id: id,
                 user_id: userId,
-            });
+            })
             
         if (error) {
             return
         }
+
+    }
+
+    const handlePostReview = async (review: string, recommend: boolean) => {
+        const {data: userData, error: errorUserData} = await supabaseClient.auth.getUser()
+        
+        if (errorUserData) {
+            return console.error(errorUserData.message);
+        }
+        const userId = userData?.user?.id;
+
+        const record = {
+            game_id: id,
+            user_id: userId,
+            recomend: recommend,
+            review,
+        }
+
+        const {data: insertData, error: errorInsert} = await supabaseClient
+        .from('game_review')
+        .insert(record)
+        .select()
+        .single()
+
+        if(errorInsert){
+            return console.error(errorInsert.message)
+        }
+        setRefreshKey(prev => prev + 1)
     }
     return (
         <div className="min-h-[100vh]" style={{backgroundColor: 'var(--gray)'}}>
@@ -159,8 +263,8 @@ export default function GamePage() {
                     </div>
                 }
             </header>
-            <main className="p-10 mt-10">
-                <div className="flex">
+            <main className="p-10 mt-10 flex-col flex gap-3">
+                <section className="flex">
                     <div className="flex-col min-w-[225px]">
                         {
                             game && 
@@ -196,7 +300,20 @@ export default function GamePage() {
                             </div>
                         </div>
                     </div>
-                </div>
+                </section>
+
+                <section className="flex flex-col gap-2">
+                    {reviews.length > 0 && reviewUser?
+                    <UserReview recomend={reviewUser.recomend} date={reviewUser.date} review={reviewUser.review}/>
+                    :
+                    <ReviewInput handlePostReview={handlePostReview}/>
+                    }
+                    {reviews.length > 0 && reviews.map((item) => {
+                        return(
+                            <ReviewComponent key={item.id} username={item.username} recomend={item.recomend} review={item.review} date={item.date}/>
+                        )
+                    })}
+                </section>
             </main>
         </div>
     )

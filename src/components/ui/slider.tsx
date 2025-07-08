@@ -35,7 +35,7 @@ export default function Slider({ banner } : SliderProps){
     const bannerSlider = banner.map((item) => {
       return(
         <SwiperSlide key={item.id}>
-            <div onClick={()=> handleClick(item.id)} className="relative h-[600px] text-white overflow-hidden bg-no-repeat bg-cover flex flex-col justify-end" style={{ backgroundImage: `url(${item.image})` }}>
+            <div onClick={()=> handleClick(item.game.id)} className="relative h-[600px] text-white overflow-hidden bg-no-repeat bg-cover flex flex-col justify-end" style={{ backgroundImage: `url(${item.image})` }}>
                 <div className="absolute inset-0 bg-black opacity-20 z-0" />
                 <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-[#000000] to-transparent z-10" />
                 <div className="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-t from-[#1D1D1D] to-transparent z-10" />
