@@ -23,7 +23,6 @@ export default function ReviewInput ({ handlePostReview }: ReviewInputProps) {
         }
 
         handlePostReview(review, recommend)
-
       return
     }
     return(

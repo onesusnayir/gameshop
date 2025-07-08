@@ -154,24 +154,6 @@ export default function GamePage() {
         fetchReview()
     },[id, refreshKey])
 
-    const reviewInput = async() => {
-        const { data: userData, error: userError } = await supabaseClient.auth.getUser()
-            if (userError) {
-                console.error("Error fetching user:", userError);
-                return;
-            }
-        const userId = userData?.user?.id;
-        const reviewUser = reviews.find(
-            (r) => r.user_id === userId && r.game_id === id
-        );
-
-        if(reviewUser){
-            return <UserReview recomend={reviewUser.recomend} date={reviewUser.date} review={reviewUser.review}/>
-        }else if(!reviewUser){
-            return <ReviewInput handlePostReview={handlePostReview}/>
-        }
-    }
-
     const handleBuy = () => {
         sessionStorage.removeItem("selectedGameIds");
         const selectedGameIds = [id];
@@ -225,6 +207,44 @@ export default function GamePage() {
         if(errorInsert){
             return console.error(errorInsert.message)
         }
+        setRefreshKey(prev => prev + 1)
+    }
+
+    const handleUpdateReview = async(review: string, recommend: boolean) => {
+        const {data: userData, error: errorUserData} = await supabaseClient.auth.getUser()
+        
+        if (errorUserData) {
+            return console.error(errorUserData.message);
+        }
+        const userId = userData?.user?.id;
+
+        const record = {
+            recomend: recommend,
+            review,
+        }
+
+        const {data: insertData, error: errorInsert} = await supabaseClient
+        .from('game_review')
+        .update(record)
+        .eq('id', reviewUser?.id)
+        .select()
+        .single()
+
+        if(errorInsert){
+            return console.error(errorInsert.message)
+        }
+        setRefreshKey(prev => prev + 1)
+    }
+    const handleDeleteReview = async() => {
+        const { data, error } = await supabaseClient
+        .from('game_review')
+        .delete()
+        .eq('id', reviewUser?.id)
+
+        console.log('idreview', reviewUser?.id)
+        if (error) return alert(error.message)
+
+            console.log(data)
         setRefreshKey(prev => prev + 1)
     }
     return (
@@ -304,7 +324,7 @@ export default function GamePage() {
 
                 <section className="flex flex-col gap-2">
                     {reviews.length > 0 && reviewUser?
-                    <UserReview recomend={reviewUser.recomend} date={reviewUser.date} review={reviewUser.review}/>
+                    <UserReview recomend={reviewUser.recomend} date={reviewUser.date} review={reviewUser.review} updateReview={handleUpdateReview} deleteReview={handleDeleteReview}/>
                     :
                     <ReviewInput handlePostReview={handlePostReview}/>
                     }
