@@ -1,28 +1,41 @@
-import supabaseClient from "@/lib/supabaseClient";
-import supabaseServer from "@/lib/supabaseServer";
 import { NextRequest, NextResponse } from 'next/server'
-
-type Game = {
-  id: string;
-  name: string;
-  price: number;
-}
-
-type Transaction = {
-    id: string;
-    date: string;
-    game: Game[];
-    tax: number;
-    paymentFee: number;
-    totalPrice: number;
-}
+import { createClient } from '@supabase/supabase-js';
 
 export async function POST(req: NextRequest) {
   const token = req.headers.get('authorization')?.replace('Bearer ', '')
+  const { transactionId, totalPrice, games} = await req.json()
+
+  const payload = {
+    gross_amount: totalPrice, 
+    order_id: transactionId
+  }
+  const baseUrl = req.nextUrl.origin;
+
+  const res = await fetch(`${baseUrl}/api/token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  const {token: token_midtrans} = await res.json()
 
   if (!token) {
     return NextResponse.json({ error: 'Missing token' }, { status: 401 })
   }
+
+  const supabaseClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      global: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    }
+  );
 
   // Ambil data user dari token
   const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token)
@@ -32,22 +45,42 @@ export async function POST(req: NextRequest) {
   }
 
   const userId = user.id
-  const body = await req.json()
 
-  // Sisipkan user_id ke setiap objek
-  const records = body.game.map((item: any) => ({
-    id: body.id,
+  const transactionRecords = {
     user_id: userId,
-    game_id: item,
-  }))
-
-  const { data, error } = await supabaseClient
-  .from('transaction')
-  .insert(records)
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    transaction_id: transactionId,
+    total_price: totalPrice,
   }
 
-  return NextResponse.json({ message: 'Insert successful', data }, { status: 200 })
+  const { data: transactionData, error: transactionError } = await supabaseClient
+  .from('transaction')
+  .insert(transactionRecords)
+  .select()
+  .single()
+
+  if (transactionError) {
+    return NextResponse.json({ error: transactionError.message }, { status: 500 })
+  }
+
+  if(!transactionData){
+    return NextResponse.json({ error: 'no data returned' }, { status: 500 })
+  }
+
+  const itemsRecords = games.map((item: string) => {
+    return{
+      transaction_id: transactionData.id,
+      game_id: item
+    }
+  })
+
+  const { data: itemsData, error: itemsError } = await supabaseClient
+  .from('transaction_items')
+  .insert(itemsRecords)
+  .select()
+
+  if(itemsError){
+    return NextResponse.json({ error: itemsError.message}, {status: 500})
+  }
+
+  return NextResponse.json({ message: 'Insert successful', token_midtrans, transaction_id: transactionData.id}, { status: 200 })
 }

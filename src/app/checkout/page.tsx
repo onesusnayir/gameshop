@@ -28,9 +28,15 @@ type Transaction = {
     paymentFee: number;
     totalPrice: number;
 }
+
+    // body.transactionId,
+    // body.totalPrice,
+    // body.game[]\
+    //  const { transactionId, totalPrice, games} = await req.json()
 export default function Checkout() {
     const [games, setGames] = useState<Game[]>([])
     const [transaction, setTransaction] = useState<Transaction>()
+    const [gamesId, setGamesId] = useState<string[]>([])
 
     useEffect(() => {
         const fetchGames = async() => {
@@ -39,6 +45,7 @@ export default function Checkout() {
 
             if (ids.length === 0) return console.error('games missing');
     
+            setGamesId(ids)
             const { data, error } = await supabaseClient
             .from('game')
             .select('id, name, price')
@@ -64,12 +71,12 @@ export default function Checkout() {
             const transactionTax = parseFloat((totalPrice * tax).toFixed(3));
 
             const newTransaction = {
-                    id : idTransaction,
-                    date: dateNow,
-                    game: data,
-                    tax: transactionTax,
-                    paymentFee: 2500,
-                    totalPrice: totalPrice,
+                id : idTransaction,
+                date: dateNow,
+                game: data,
+                tax: transactionTax,
+                paymentFee: 2500,
+                totalPrice: totalPrice,
             }
 
             setGames(data)
@@ -85,9 +92,10 @@ export default function Checkout() {
 
         if(!transaction) return
         const request = {
-            id: transaction.id,
-            games: transaction.game,
-            total_price: transaction.totalPrice,
+            transactionId: transaction.id,
+            totalPrice: transaction.totalPrice,
+            games: gamesId
+
         }
 
         const res = await fetch('/api/transactions', {
@@ -99,109 +107,33 @@ export default function Checkout() {
             body: JSON.stringify(request),
         });
 
+        const {token_midtrans, transaction_id} = await res.json()
+
+        window.snap.pay(token_midtrans, {
+            onSuccess: async function(result: any) {
+                console.log('Pembayaran sukses:', result)
+                const { data: updateData, error: errorUpdate } = await supabaseClient
+                .from('transaction')
+                .update({ status: 'Paid' })
+                .eq('id', transaction_id);
+            },
+            onPending: async function(result : any) {
+                console.log('Pembayaran pending:', result)
+                console.log('transaction id:',transaction_id)
+                const { data: updateData, error: errorUpdate } = await supabaseClient
+                .from('transaction')
+                .update({ status: 'Failed' })
+                .eq('id', transaction_id);
+            },
+            onError: function(result: any) {
+                console.log('Pembayaran gagal:', result)
+                // Tampilkan error ke user
+            },
+            onClose: async function() {
+                console.log('User menutup popup tanpa menyelesaikan pembayaran')
+            }
+        })
     }
-
-    // const [game, setGame] = useState<Game | null>(null);
-    // const [id, setId] = useState<string | null>(null);
-    // const [token, setToken] = useState<string | null>(null);
-    // const router = useRouter();
-
-    // useEffect(() => {
-    // if (typeof window !== "undefined") {
-    //     const searchParams = new URLSearchParams(window.location.search);
-    //     const gameId = searchParams.get('id');
-    //     setId(gameId);
-    // }
-    // }, []);
-
-
-    // useEffect(() => {
-    //     const checkSession = async () => {
-    //     const { data: { session } } = await supabaseClient.auth.getSession()
-    //     console.log(session)
-    //         if (!session) {
-    //             router.push('/login')
-    //         }
-    //     }
-
-    //     checkSession()
-    // }, [])
-
-    // useEffect(() => {
-    //     if (!id) return;
-
-    //     const fetchGame = async () => {
-    //         const { data, error } = await supabaseClient
-    //             .from('game')
-    //             .select('*')
-    //             .eq('id', id)
-    //             .single();
-
-    //         if (error) {
-    //             console.error("Error fetching game:", error);
-    //             return;
-    //         }
-    //         setGame(data);
-    //     }
-
-    //     fetchGame();
-    // }, [id]);
-
-    // // Buy Onlciclk
-    // const handlePay = async () => {
-            
-    //     const { data: { user } } = await supabaseClient.auth.getUser()
-    //     if (!user) {
-    //         console.error("User not authenticated");
-    //         return;
-    //     }
-    //     const res = await fetch('/api/token', {
-    //         method: 'POST',
-    //         headers: { 'Content-Type': 'application/json' },
-    //         credentials: 'include',
-    //         body: JSON.stringify({ 
-    //             gross_amount: (game && game.price * 11 / 100 + 2500 + game.price),
-    //             game_id: game?.id,
-    //             user_id: user.id
-    //         }),
-    //     })
-    //     const data = await res.json()
-    //     setToken(data.token);
-
-    //     const { data: transactionData, error: transactionError } = await supabaseClient
-    //         .from('transaction')
-    //         .insert({
-    //             id: data.orderId,
-    //             user_id: user.id,
-    //             game_id: game?.id,
-    //             total_price: (game && game.price * 11 / 100 + 2500 + game.price)
-    //         })
-    //     if (transactionError) {
-    //         console.error("Error inserting transaction:", transactionError);
-    //         return
-    //     }
-
-
-    //     // Jalankan Midtrans Snap
-    //     window.snap.pay(data.token, {
-    //         onSuccess: function(result: any) {
-    //             console.log('Pembayaran sukses:', result)
-    //             // Tampilkan modal / update UI
-    //         },
-    //         onPending: function(result : any) {
-    //             console.log('Pembayaran pending:', result)
-    //             // Bisa tampilkan pesan: "Silakan selesaikan pembayaran"
-    //         },
-    //         onError: function(result: any) {
-    //             console.log('Pembayaran gagal:', result)
-    //             // Tampilkan error ke user
-    //         },
-    //         onClose: function() {
-    //             console.log('User menutup popup tanpa menyelesaikan pembayaran')
-    //         }
-    //     })
-    // }
-    
 
     return (
         <div className="min-h-screen" style={{backgroundColor: 'var(--gray)'}}>
@@ -209,7 +141,7 @@ export default function Checkout() {
                 <Navbar/>
             </header>
             <main className="p-10">
-               <h1 className="text-2xl text-white font-semibold">Order Details</h1>
+               <h1 className="text-2xl text-white font-semibold">Payment Details</h1>
                <section className="p-5 mt-5" style={{backgroundColor: 'var(--dark-gray)'}}>
                 <div className="flex justify-between">
                     <p style={{color: 'var(--light-gray)'}}>Transaction Id</p>

@@ -1,6 +1,7 @@
 'use client'
 
 import Navbar from "@/components/ui/navbar"
+import Footer from "@/components/ui/footer";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -149,18 +150,27 @@ export default function Wishlist(){
     }
 
     return(
-        <div className="min-h-screen" style={{backgroundColor: 'var(--gray)'}}>
+        <div className="min-h-screen flex flex-col" style={{backgroundColor: 'var(--gray)'}}>
             <header>
                 <Navbar />
             </header>
-            <main className="mt-[60px]">
-                <div className="p-10">
-                    <h1 className="text-white text-2xl font-semibold py-5">Your Wishlist</h1>
-                    <div className="flex flex-col gap-3">
-                        {games.length > 0 && gamesList}
+            <main className="mt-[60px] flex-1 flex flex-col">
+                {
+                    isLogin?
+                    <div className="p-10">
+                        <h1 className="text-white text-2xl font-semibold py-5">Your Wishlist</h1>
+                        <div className="flex flex-col gap-3">
+                            {games.length > 0 && gamesList}
+                        </div>
                     </div>
-                </div>
+                    :
+                    <div className="flex-1 flex flex-col items-center justify-center">
+                        <h1 className="text-2xl font-semibold" style={{color: 'var(--green)'}}>Please Login!</h1>
+                        <p className="text-white">Join us and log in to see your wishlist</p>
+                    </div>
+                }
             </main>
+            <Footer/>
         </div>
     )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import Navbar from "@/components/ui/navbar";
+import Footer from "@/components/ui/footer";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import supabaseClient from "@/lib/supabaseClient";
@@ -100,7 +101,7 @@ export default function cartPage(){
 
     const handleBuy = () => {
         sessionStorage.removeItem("selectedGameIds");
-        const selectedGameIds = [games.map((game) => game.id)];
+        const selectedGameIds = games.map((game) => game.id);
 
         sessionStorage.setItem("selectedGameIds", JSON.stringify(selectedGameIds));
         router.push('/checkout')
@@ -160,14 +161,7 @@ export default function cartPage(){
                         <h2 className="text-xl font-semibold" style={{color: 'var(--green)'}}>Please Login</h2>
                         <p className="text-white">Join us and log in to see your cart</p>
                     </div>
-                    <div className="flex justify-center">
-                        <div className="relative w-[383px] h-[33px]">
-                            <Image
-                                src={'/copyright.png'}
-                                fill
-                                alt="copyright"/>
-                        </div>
-                    </div>
+                    <Footer />
                 </main>
             }
         </div>

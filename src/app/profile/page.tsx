@@ -16,7 +16,6 @@ type GameHistory = {
   image: string;
 }
 
-
 type User = {
     id: string;
     username: string;
@@ -66,32 +65,35 @@ export default function Profile(){
         if (!user) return;
         const fetchGame = async () => {
             const { data: historyData, error: historyError } = await supabaseClient
-            .from('game_transaction_view')
-            .select('*')
+            .from('transaction_view')
+            .select('id, name, description, genre, price, image_filename, created_at')
             .eq('user_id', user.id)
+            .eq('status', 'Paid')
 
             if (historyError) {
                 console.error("Error fetching games:", historyError.message);
                 return;
             }
+            if(!historyData) return
 
             const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
             const gameWithImage = historyData.map((data: any) => {
-                const date = new Date(data.transaction_date);
+                const date = new Date(data.created_at);
 
                 const formatted = date.toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
                 });
                 return {
-                    ...data,
-                    id: data.transaction_id,
-                    name: data.game_name,
-                    genre: data.genres,
+                    id: data.id,
+                    name: data.name,
+                    description: data.description,
+                    genre: data.genre,
                     created_at: formatted,
-                    image: `${baseUrl}/storage/v1/object/public/games/${data.image_url}`
+                    price: data.price,
+                    image: `${baseUrl}/storage/v1/object/public/games/${data.image_filename}`
                 };
             });
 
@@ -127,7 +129,7 @@ export default function Profile(){
                         <h1 className="text-white text-3xl ">{game.name}</h1>
                         {game.genre && 
                             <div className="flex gap-3">
-                                { game.genre.map((item, index) => <p className="text-white text-sm px-3 py-1 rounded-sm bg-[#626262]" key={index}>{item}</p>)}
+                                { game.genre.map((item, index) => <p className="text-white text-sm px-3 py-1 rounded-sm bg-[#626262] text-nowrap" key={index}>{item}</p>)}
                             </div>
                             }
                         <p className="line-clamp-2 text-sm" style={{color: 'var(--light-gray)'}}>{game.description}</p>
