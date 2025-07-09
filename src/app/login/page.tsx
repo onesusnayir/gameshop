@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import supabaseClient from "@/lib/supabaseClient"
+import AuthFooter from "@/components/ui/authFooter";
 import { useRouter } from 'next/navigation';
 import { useState } from 'react'
 
@@ -112,7 +113,7 @@ export default function LoginPage() {
                         <div className="flex whitespace-nowrap">Need an account?<button onClick={handleSignUp} type="button" className="ml-2 cursor-pointer" style={{ color: 'var(--green)' }}>Register here</button></div>
                     </div>
                 </form>
-                <p className="text-white text-xs mx-auto mb-5">Terms of Service | Privacy Policy</p>
+                <AuthFooter/>
             </div>
         </div>
     )

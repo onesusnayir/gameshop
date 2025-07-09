@@ -1,6 +1,7 @@
 'use client'
 import Image from "next/image"
 import supabaseClient from "@/lib/supabaseClient"
+import AuthFooter from "@/components/ui/authFooter";
 import { useRouter } from 'next/navigation';
 import { useState } from 'react'
 
@@ -83,7 +84,7 @@ export default function RegisterPage() {
                         <div className="flex items-center whitespace-nowrap">Alrady have an account?<button onClick={handleSignIn} type="button" className="cursor-pointer ml-2" style={{ color: 'var(--green)'}}>Sign in here</button></div>
                     </div>
                 </form>
-                <p className="text-white text-xs mx-auto mb-5">Terms of Service | Privacy Policy</p>
+                <AuthFooter/>
             </div>
 
             <div className="grow h-[100%] flex items-center justify-center">

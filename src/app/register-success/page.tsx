@@ -1,8 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import supabaseClient from '@/lib/supabaseClient'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import AuthFooter from '@/components/ui/authFooter'
 
 export default function RegistrasiBerhasil() {
   const [username, setUsername] = useState<string | null>(null)
@@ -59,19 +59,7 @@ export default function RegistrasiBerhasil() {
             <button onClick={loginHandler} className='w-full py-1 mt-5 rounded cursor-pointer' style={{backgroundColor: 'var(--green)'}}>BACK TO LOGIN</button>
           </div>
         }
-        <footer className='flex flex-col p-3'>
-          <div className='flex justify-center gap-3'>
-            <div className='relative w-[25px] h-[25px]'>
-              <Image
-              src={'/icon.svg'}
-              fill
-              alt='icon'
-              />
-            </div>
-            <p className='font-semibold' style={{color: 'var(--green)'}}>STORE</p>
-          </div>
-          <p className='text-white w-full text-center'>Terms Of Service | Privacy Policy</p>
-        </footer>
+        <AuthFooter/>
       </div>
       <div className='flex-1 bg-cover bg-center' style={{backgroundImage: 'url(/games_bg.jpg)'}}></div>
     </div>

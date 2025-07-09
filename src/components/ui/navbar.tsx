@@ -3,7 +3,7 @@
 import supabaseClient from "@/lib/supabaseClient";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 type User = {
   id: string;
@@ -13,6 +13,7 @@ type User = {
 
 export default function Navbar () {
     const [ user, setUser ] = useState<User>()
+    const inputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
         const fetchSession = async () => {
@@ -55,6 +56,15 @@ export default function Navbar () {
     const handleClick = () => {
         router.push('/profile')
     }
+    const handleSearch = () => {
+        const value = inputRef.current?.value
+        router.push(`/search?name=${value}`)
+    }
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch()
+    }
+  }
     return(
         <nav className="max-h-[60px] fixed top-0 z-50 w-full p-5 flex gap-5 text-white items-center justify-around" style={{ backgroundColor: '#000000' }}>
             <Image 
@@ -70,10 +80,10 @@ export default function Navbar () {
                 <li onClick={handleCart}><button className="cursor-pointer">Cart</button></li>
             </ul>
             <div className="flex min-w-[300px] rounded-sm items-center" style={{ backgroundColor: 'var(--dark-gray)' }}>
-                <button className="text-xl flex items-center cursor-pointer">
+                <button onClick={handleSearch} className="text-xl flex items-center cursor-pointer">
                     <span className="material-symbols-outlined text-white text-xl ml-4">search</span>
                 </button>
-                <input className="grow px-4 py-2 border-none outline-none rounded-sm" type="text" placeholder="Search"/>
+                <input ref={inputRef} onKeyDown={handleKeyDown} className="grow px-4 py-2 border-none outline-none rounded-sm" type="text" placeholder="Search"/>
             </div>
             {user ? 
             <p className="cursor-pointer" onClick={handleClick}>{user.username}</p>

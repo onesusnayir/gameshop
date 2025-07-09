@@ -1,14 +1,12 @@
 'use client'
 
-import {useState} from 'react'
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Footer from "@/components/ui/footer";
 import supabaseClient from "@/lib/supabaseClient";
-import '@/app/globals.css'
+import AuthFooter from "@/components/ui/authFooter";
 
 export default function forgetPassPage(){
-    
+    const router = useRouter()
     const handleReset = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
@@ -22,6 +20,9 @@ export default function forgetPassPage(){
         })
     }
 
+    const handleLogin = () => {
+        router.push('/login')
+    }
     return (
         <div className="min-h-screen flex">
             <div className="relative flex-1">
@@ -48,11 +49,11 @@ export default function forgetPassPage(){
                                 placeholder="Enter your email"
                             />
                         </label>
-                        <input type="submit" className="py-1 rounded" style={{backgroundColor: 'var(--green)'}}/>
-                        <p className="w-full text-center text-white">Back to Login <button style={{color: 'var(--green)'}}>here</button></p>
+                        <input type="submit" className="py-1 rounded cursor-pointer" style={{backgroundColor: 'var(--green)'}}/>
+                        <p className="w-full text-center text-white">Back to Login <button onClick={handleLogin} className="cursor-pointer" style={{color: 'var(--green)'}}>here</button></p>
                     </form>
                 </div>
-                <Footer />
+                <AuthFooter />
             </section>
         </div>
     )

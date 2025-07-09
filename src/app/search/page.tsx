@@ -1,10 +1,11 @@
-'use client';
-import { useState, useEffect, use } from "react";
-import supabaseClient from "@/lib/supabaseClient";
-import Navbar from "@/components/ui/navbar";
-import Footer from "@/components/ui/footer";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+'use client'
+import Footer from "@/components/ui/footer"
+import supabaseClient from "@/lib/supabaseClient"
+import Navbar from "@/components/ui/navbar"
+import Image from "next/image"
+import { useEffect, useState } from "react"
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from "next/navigation"
 
 type Game = {
   id: string;
@@ -15,32 +16,53 @@ type Game = {
   image: string;
 }
 
-export default function GamesPage() {
-    const [games, setGames] = useState<Game[]>([]);
-    const router = useRouter();
+export default function Search () {
+    const [gameName, setGameName] = useState<string|null>()
+    const [games, setGames] = useState<Game[]>([])
+    const searchParams = useSearchParams()
+    const router = useRouter()
 
     useEffect(() => {
-        const fetchGames = async () => {
-            const { data, error } = await supabaseClient
-                .from('game_view')
-                .select('id, name, description, price, image_filename, genre');
+        const getParams = () => {
+            const gameNameUrl = searchParams.get('name')
+            setGameName(gameNameUrl)
+        }
 
-            if (error) {
-                console.error("Error fetching games:", error);
-                return;
-            }
+        getParams()
+    },[searchParams])
+
+    useEffect(() => {
+        const fetchGameData = async () => {
+            if(!gameName) return
+
+            const {data, error} = await supabaseClient
+            .from('game_view')
+            .select(
+            'id, name, description, price, genre, image_filename'
+            )
+            .ilike('name', `%${gameName}%`)
+
+            if(error) return console.error(error.message)
+
+            if(!data) return
 
             const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-            const gamesWithImages = data.map((game) => ({
-                ...game,
-                image: `${baseUrl}/storage/v1/object/public/games/${game.image_filename}`
-            }));
+            const gameWithImage = data.map((item) => {
+                return{
+                    id: item.id,
+                    name: item.name,
+                    description: item.description,
+                    price: item.price,
+                    genre: item.genre,
+                    image: `${baseUrl}/storage/v1/object/public/games/${item.image_filename}`
 
-            setGames(gamesWithImages);
-        };
+                }
+            })
+            setGames(gameWithImage)
+        }
 
-        fetchGames();
-    }, [])
+        fetchGameData()
+    },[gameName])
 
     const gamesList = games.map((game) => {
         return(
@@ -56,7 +78,7 @@ export default function GamesPage() {
                 <div className="flex p-5 w-full justify-between">
                     <div className="grow max-w-[450px] flex flex-col justify-center gap-3">
                         <h1 className="text-white text-3xl ">{game.name}</h1>
-                         { game && game.genre.length > 0 && 
+                            { game && game.genre.length > 0 && 
                             <div className="flex gap-3 mt-2 text-nowrap">
                                 {game.genre.map((item, index) => <p className="text-white text-sm px-3 py-1 rounded-sm bg-[#626262]" key={index}>{item}</p>)}
                             </div>
@@ -83,6 +105,7 @@ export default function GamesPage() {
     const handleCart = async (game_id: string) => {
         const { data: userData, error: userError } = await supabaseClient.auth.getUser()
         if (userError) {
+            console.error("Error fetching user:", userError);
             alert("You should login first");
             return;
         }
@@ -103,6 +126,7 @@ export default function GamesPage() {
     const handleWishlist = async(game_id: string) => {
         const { data: userData, error: userError } = await supabaseClient.auth.getUser()
         if (userError) {
+            console.error("Error fetching user:", userError);
             alert("You should login first");
             return;
         }
@@ -119,18 +143,25 @@ export default function GamesPage() {
             return
         }
     }
+
     return(
-        <div className="min-h-[100vh] w-full" style={{backgroundColor: 'var(--gray)'}}>
-            <header>
-                <Navbar />
-            </header>
-            <main className="mt-[60px] pt-5 px-10">
-                <h1 className="text-white font-semibold text-2xl mb-5">All Games</h1>
-                <div className="flex flex-col items-center gap-3">
-                    {games.length > 0 && gamesList}
-                </div>
-            </main>
-            <Footer />
-        </div>
+    <div className="min-h-screen flex flex-col" style={{backgroundColor: 'var(--gray)'}}>
+        <header>
+            <Navbar/>
+        </header>
+        <main className="mt-[60px] flex-1">
+            <section className="px-5 py-10">
+                {gameName && games.length > 0? 
+                <div className="flex flex-col gap-3">
+                    {gamesList}
+                </div> 
+                : 
+                <div className="p-5" style={{backgroundColor: 'var(--dark-gray)'}}>
+                    <p style={{color: 'var(--light-gray)'}}>{`0 Result match your search '${gameName}'`}</p>
+                </div>}
+            </section>
+        </main>
+        <Footer/>
+    </div>
     )
 }

@@ -1,10 +1,12 @@
 'use client'
 
 import Image from "next/image";
-import Footer from "@/components/ui/footer";
+import AuthFooter from "@/components/ui/authFooter";
 import supabaseClient from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 export default function forgetPassPage(){
+    const router = useRouter()
     const hanldlePassword = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
@@ -19,6 +21,15 @@ export default function forgetPassPage(){
             email: email,
             password: newPassword,
         })
+        if(errorUpdate){
+            alert('Error update password: '+ errorUpdate.message)
+            return
+        }
+        alert('Password successfully updated')
+    }
+    
+    const handleLogin = () => {
+        router.push('/login')
     }
     return (
         <div className="min-h-screen flex">
@@ -41,11 +52,11 @@ export default function forgetPassPage(){
                             Password
                             <input className="border-none outline-none bg-white p-3 text-black rounded" type="text" name="password" placeholder="Enter your new password"/>
                         </label>
-                        <input type="submit" className="py-1 rounded" style={{backgroundColor: 'var(--green)'}}/>
-                        <p className="w-full text-center text-white">Back to Login <button style={{color: 'var(--green)'}}>here</button></p>
+                        <input type="submit" className="py-1 rounded cursor-pointer" style={{backgroundColor: 'var(--green)'}}/>
+                        <p className="w-full text-center text-white">Back to Login <button onClick={handleLogin} className="cursor-pointer" style={{color: 'var(--green)'}}>here</button></p>
                     </form>
                 </div>
-                <Footer />
+                <AuthFooter />
             </section>
         </div>
     )

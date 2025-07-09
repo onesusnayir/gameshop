@@ -48,6 +48,7 @@ export default function GamePage() {
     const [ reviews, setReviews] = useState<Review[]>([])
     const [ reviewUser, setReviewUser] = useState<Review>()
     const [refreshKey, setRefreshKey] = useState(0);
+    const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false)
     const router = useRouter()
     const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -139,7 +140,6 @@ export default function GamePage() {
 
             const { data: userData, error: userError } = await supabaseClient.auth.getUser()
             if (userError) {
-                console.error("Error fetching user:", userError);
                 return;
             }
             const userId = userData?.user?.id;
@@ -154,9 +154,30 @@ export default function GamePage() {
         fetchReview()
     },[id, refreshKey])
 
-    const handleBuy = () => {
+    useEffect(() => {
+    const checkUser = async () => {
+      const { data, error } = await supabaseClient.auth.getUser()
+
+      if (error) {
+        setIsUserLoggedIn(false)
+        return
+      }
+
+      setIsUserLoggedIn(!!data.user) 
+    }
+
+    checkUser()
+  }, [])
+
+    const handleBuy = async() => {
         sessionStorage.removeItem("selectedGameIds");
         const selectedGameIds = [id];
+
+        const { data: userData, error: userError } = await supabaseClient.auth.getUser()
+        if (userError) {
+            alert('You should login first')
+            return;
+        }
 
         sessionStorage.setItem("selectedGameIds", JSON.stringify(selectedGameIds));
         router.push('/checkout')
@@ -165,7 +186,7 @@ export default function GamePage() {
     const handleCart = async () => {
         const { data: userData, error: userError } = await supabaseClient.auth.getUser()
         if (userError) {
-            console.error("Error fetching user:", userError);
+            alert('You should login first')
             return;
         }
         const userId = userData?.user?.id;
@@ -247,6 +268,26 @@ export default function GamePage() {
             console.log(data)
         setRefreshKey(prev => prev + 1)
     }
+    const handleWishlist = async() => {
+        if(!id) return alert('Something went wrong, please try again')
+        const { data: userData, error: userError } = await supabaseClient.auth.getUser()
+        if (userError) {
+            alert("You should login first");
+            return;
+        }
+        const userId = userData?.user?.id;
+        
+        const { data, error } = await supabaseClient
+            .from('wishlist')
+            .insert({
+                game_id: id,
+                user_id: userId,
+            });
+            
+        if (error) {
+            return
+        }
+    }
     return (
         <div className="min-h-[100vh]" style={{backgroundColor: 'var(--gray)'}}>
             <header>
@@ -298,7 +339,7 @@ export default function GamePage() {
                             </div>
                         }
                         <div className="flex p-2 gap-3 mt-5">
-                            <button className="flex-1 px-3 py-1 text-nowrap rounded-sm font-semibold" style={{backgroundColor: 'var(--green)'}}>+ Wishlist</button>
+                            <button onClick={handleWishlist} className="flex-1 px-3 py-1 text-nowrap rounded-sm font-semibold" style={{backgroundColor: 'var(--green)'}}>+ Wishlist</button>
                             <button onClick={handleCart} className="flex-1 px-3 py-1 text-nowrap rounded-sm font-semibold cursor-pointer" style={{backgroundColor: 'var(--green)'}}>+ Cart</button>
                         </div>
                     </div>
@@ -323,10 +364,17 @@ export default function GamePage() {
                 </section>
 
                 <section className="flex flex-col gap-2">
-                    {reviews.length > 0 && reviewUser?
+                    {
+                    isUserLoggedIn ?
+                    (reviews.length > 0 && reviewUser?
                     <UserReview recomend={reviewUser.recomend} date={reviewUser.date} review={reviewUser.review} updateReview={handleUpdateReview} deleteReview={handleDeleteReview}/>
                     :
-                    <ReviewInput handlePostReview={handlePostReview}/>
+                    <ReviewInput handlePostReview={handlePostReview}/>)
+                    :
+                    <div className="py-20 px-10 flex flex-col justify-center items-center" style={{backgroundColor: 'var(--dark-gray)'}}>
+                        <h1 className="text-xl font-semibold" style={{color: 'var(--green)'}}>Please Login</h1>
+                        <p className="text-white">Join us and log in to write your reviews</p>
+                    </div>
                     }
                     {reviews.length > 0 && reviews.map((item) => {
                         return(
