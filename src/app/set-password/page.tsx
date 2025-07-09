@@ -1,3 +1,5 @@
+'use client'
+
 import Image from "next/image";
 import Footer from "@/components/ui/footer";
 import supabaseClient from "@/lib/supabaseClient";
