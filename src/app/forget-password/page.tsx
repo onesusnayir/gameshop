@@ -18,6 +18,8 @@ export default function forgetPassPage(){
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl,
         })
+
+        alert(`We sent an email to you, please check your email`)
     }
 
     const handleLogin = () => {
