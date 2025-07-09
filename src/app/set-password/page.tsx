@@ -53,7 +53,7 @@ export default function forgetPassPage(){
                             <input className="border-none outline-none bg-white p-3 text-black rounded" type="text" name="password" placeholder="Enter your new password"/>
                         </label>
                         <input type="submit" className="py-1 rounded cursor-pointer" style={{backgroundColor: 'var(--green)'}}/>
-                        <p className="w-full text-center text-white">Back to Login <button onClick={handleLogin} className="cursor-pointer" style={{color: 'var(--green)'}}>here</button></p>
+                        <p className="w-full text-center text-white">Back to Login <button type="button" onClick={handleLogin} className="cursor-pointer" style={{color: 'var(--green)'}}>here</button></p>
                     </form>
                 </div>
                 <AuthFooter />
