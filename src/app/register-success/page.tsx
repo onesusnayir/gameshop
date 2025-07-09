@@ -43,10 +43,12 @@ export default function RegistrasiBerhasil() {
     <div className='w-full h-screen flex'>
       <div className='w-[550px] h-full flex flex-col' style={{backgroundColor: 'var(--gray)'}}>
         
-        {inserted? 
-          <svg className="animate-spin h-20 w-20" viewBox="0 0 24 24" style={{color: 'var(--green)'}}>
-            <path fill="currentColor" className="opacity-60" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
-          </svg>
+        {!inserted? 
+          <div className='flex-1 flex justify-center items-center'>
+            <svg className="animate-spin h-20 w-20" viewBox="0 0 24 24" style={{color: 'var(--green)'}}>
+              <path fill="currentColor" className="opacity-60" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+            </svg>
+          </div>
           :
           <div className='p-10 flex-1 flex flex-col items-start justify-center'>
             <h1 className='text-2xl font-semibold' style={{color: 'var(--green)'}}>Success</h1>
